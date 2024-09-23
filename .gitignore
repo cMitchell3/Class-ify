@@ -1,0 +1,16 @@
+# Ignore Unity Temp files/directories
+Temp/
+
+# Ignore Unity packages
+Packages/
+
+# Ignore Unity Library
+Library/
+
+# Ignore Unity User Settings
+UserSettings/
+
+# Ignore more Unity and vsCode files
+Logs/
+*.vsconfig
+/Class-ifyApp.sln
