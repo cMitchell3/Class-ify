@@ -2,7 +2,7 @@
 Class-ifyApp/Temp/
 
 # Ignore Unity packages
-Class-ifyApp/Packages/
+# Class-ifyApp/Packages/
 
 # Ignore Unity Library
 Class-ifyApp/Library/
