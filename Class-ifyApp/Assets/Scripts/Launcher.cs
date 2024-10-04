@@ -96,9 +96,17 @@ namespace Com.CS.Classify
 
         #region MonoBehaviourPunCallbacks Callbacks
 
-        // Join room successful
+        // Join a room
         public override void OnJoinedRoom()
         {
+            // We only load if we are the first player, else we rely on `PhotonNetwork.AutomaticallySyncScene` to sync our instance scene.
+            if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+            {
+                Debug.Log("Loading RoomScene");
+
+                // Load the Room Level.
+                PhotonNetwork.LoadLevel("RoomScene");
+            }
             Debug.Log("Successfully joined a room: " + PhotonNetwork.CurrentRoom.Name);
         }
 
