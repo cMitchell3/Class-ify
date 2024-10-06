@@ -4,32 +4,44 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviourPun
 {
     public Rigidbody2D rb;
     public float moveSpeed;
     float xInput;
     float yInput;
-    private PhotonView photonView;
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
     private AudioListener audioListener;
 
-    void Start()
-    {
-        rb = GetComponent<Rigidbody2D>();
-    }
-
     void Awake() {
-        photonView = GetComponent<PhotonView>();
         audioListener = GetComponent<AudioListener>();
 
         if (photonView.IsMine)
         {
-            PlayerController.LocalPlayerInstance = this.gameObject;
+            LocalPlayerInstance = gameObject;
         }
         else {
             Destroy(audioListener);
+        }
+    }
+
+    void Start()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        Camera mainCamera = Camera.main;
+
+        if (mainCamera != null)
+        {
+            if (photonView.IsMine)
+            {
+                // If this player is the local player, set the Main Camera to follow it
+                mainCamera.transform.localPosition = new Vector3(0, 0, -10);
+            }
+        }
+        else
+        {
+            Debug.LogError("Main Camera not found in the scene.");
         }
     }
 
