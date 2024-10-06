@@ -65,10 +65,10 @@ namespace Com.CS.Classify
 
         /// When join room button is clicked, connect to room (temporary implementation for testing)
         private void OnJoinRoomButtonClicked()
-        // NOTE: This will give an error right now because create room automatically joins the room but we do not have a scene set up yet where I can send the user once they join
         {
             if (PhotonNetwork.IsConnected)
             {
+                Debug.Log("Joining room " + tempRoomJoinCode);
                 PhotonNetwork.JoinRoom(tempRoomJoinCode); // TODO update to include actual room code input field
             }
             else
@@ -82,7 +82,6 @@ namespace Com.CS.Classify
         {
             if (PhotonNetwork.IsConnected)
             {
-
                 RoomOptions roomOptions = new RoomOptions { MaxPlayers = 16 }; 
                 PhotonNetwork.CreateRoom(tempRoomJoinCode, roomOptions); // TODO update to include actual room code input field
             }
@@ -107,7 +106,7 @@ namespace Com.CS.Classify
                 // Load the Room Level.
                 PhotonNetwork.LoadLevel("RoomScene");
             }
-            Debug.Log("Successfully joined a room: " + PhotonNetwork.CurrentRoom.Name);
+            Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
         }
 
         // Join room failed, create new room
