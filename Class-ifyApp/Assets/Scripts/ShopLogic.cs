@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenuLogic : MonoBehaviour
+public class ShopLogic : MonoBehaviour
 {
     // Start is called before the first frame update
     void Start()
@@ -17,13 +17,8 @@ public class MainMenuLogic : MonoBehaviour
         
     }
 
-    public void SettingsButton()
+    public void BackButton()
     {
-        SceneManager.LoadScene("SettingsScene");
-    }
-
-    public void ShopButton()
-    {
-        SceneManager.LoadScene("ShopScene");
+        SceneManager.LoadScene("MainMenuScene");
     }
 }
