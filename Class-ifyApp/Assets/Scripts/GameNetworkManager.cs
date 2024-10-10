@@ -20,7 +20,7 @@ namespace Com.CS.Classify
 
         #region Public Methods
 
-
+        // Player leaves room
         public void LeaveRoom()
         {
             Debug.Log("Leaving room");
@@ -29,11 +29,19 @@ namespace Com.CS.Classify
 
         #endregion
 
-        #region Photon Callbacks
+        #region MonoBehaviour CallBacks
 
+        // Called when script is loaded, instantiates player
+        public void Start() {
+            InstantiatePlayer();
+        }
+
+        #endregion
+
+        #region Methods
+
+        // Instantiates the local player, throws an error if player is not in room or player prefab is not set up
         public void InstantiatePlayer() {
-            Debug.Log("Current Room: " + PhotonNetwork.CurrentRoom);
-
             if (!PhotonNetwork.InRoom)
             {
                 Debug.LogError("Player is not in a room. Cannot instantiate player.");
@@ -48,7 +56,6 @@ namespace Com.CS.Classify
                 if (PlayerController.LocalPlayerInstance == null)
                 {
                     Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
-                    // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
                     PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
                 }
                 else
@@ -58,19 +65,22 @@ namespace Com.CS.Classify
             }
         }
 
-        public void Start() {
-            InstantiatePlayer();
-        }
+        #endregion
 
-        // Player leaves room, send them back to main menu
+
+        #region MonoBehaviourPunCallbacks Callbacks
+
+        // After player leaves room, send them to main menu scene
         public override void OnLeftRoom()
         {
             SceneManager.LoadScene(0);
         }
 
+        // When another player enters the room, log information, instantiate them if local
         public override void OnPlayerEnteredRoom(Player other)
         {
-            Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName); // not seen if you're the player connecting
+            // Not seen if you're player joining
+            Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -84,9 +94,10 @@ namespace Com.CS.Classify
             }
         }
 
+        // When another player leaves the room, log information
         public override void OnPlayerLeftRoom(Player other)
         {
-            Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName); // seen when other disconnects
+            Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {

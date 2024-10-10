@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviourPun
     public static GameObject LocalPlayerInstance;
     private AudioListener audioListener;
 
+    // Initialize local player instance if this is an instance of the local player
     void Awake() {
         audioListener = GetComponent<AudioListener>();
 
@@ -21,48 +22,45 @@ public class PlayerController : MonoBehaviourPun
         {
             PlayerController.LocalPlayerInstance = this.gameObject;
         }
-        else {
-            Destroy(audioListener);
-        }
-
-        // DontDestroyOnLoad(this.gameObject);
     }
 
+    // Check if this is the local player's instance, if so enable main camera and audio listener, otherwise disable them
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        // Check if this is the local player's instance
+
+        // Enable local player's camera and audio listener
         if (photonView.IsMine)
         {
-            // Ensure the local player's camera is active
             Camera mainCamera = GetComponentInChildren<Camera>(true);
             if (mainCamera != null)
             {
-                mainCamera.enabled = true;  // Enable the camera for the local player
+                mainCamera.enabled = true; 
+
                 AudioListener audioListener = mainCamera.GetComponent<AudioListener>();
                 if (audioListener != null)
                 {
-                    audioListener.enabled = true;  // Ensure audio listener is enabled for local player
+                    audioListener.enabled = true;
                 }
             }
         }
         else
         {
-            // Disable the camera and audio listener for remote players
+            // Locally disable the camera and audio listener for other players' prefabs
             Camera otherCamera = GetComponentInChildren<Camera>(true);
             if (otherCamera != null)
             {
-                otherCamera.enabled = false;  // Disable the camera for remote players
+                otherCamera.enabled = false;
                 AudioListener otherAudioListener = otherCamera.GetComponent<AudioListener>();
                 if (otherAudioListener != null)
                 {
-                    otherAudioListener.enabled = false;  // Disable the audio listener for remote players
+                    otherAudioListener.enabled = false;
                 }
             }
         }
     }
 
-    // Update is called once per frame
+    // Check if this is local player's instance, if so enable movement, otherwise do nothing
     void Update()
     {
         if (photonView.IsMine == false && PhotonNetwork.IsConnected == true)
