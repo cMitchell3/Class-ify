@@ -98,6 +98,8 @@ namespace Com.CS.Classify
         // Join a room
         public override void OnJoinedRoom()
         {
+            Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
+
             // We only load if we are the first player, else we rely on `PhotonNetwork.AutomaticallySyncScene` to sync our instance scene.
             if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
             {
@@ -106,7 +108,6 @@ namespace Com.CS.Classify
                 // Load the Room Level.
                 PhotonNetwork.LoadLevel("RoomScene");
             }
-            Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
         }
 
         // Join room failed, create new room

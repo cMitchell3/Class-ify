@@ -20,8 +20,28 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
-        void Start() {
+        public void LeaveRoom()
+        {
+            Debug.Log("Leaving room");
+            PhotonNetwork.LeaveRoom();
+        }
+
+        #endregion
+
+        #region Photon Callbacks
+
+        public void Start() {
+            while (!PhotonNetwork.InRoom) {
+
+            }
+
             Debug.Log("Current Room: " + PhotonNetwork.CurrentRoom);
+
+            if (!PhotonNetwork.InRoom)
+            {
+                Debug.LogError("Player is not in a room. Cannot instantiate player.");
+                return;
+            }
 
             if (playerPrefab == null)
             {
@@ -41,16 +61,34 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public void LeaveRoom()
-        {
-            PhotonNetwork.LeaveRoom();
+        public override void OnJoinedRoom() {
+            // Debug.Log("Current Room: " + PhotonNetwork.CurrentRoom);
+
+            // if (!PhotonNetwork.InRoom)
+            // {
+            //     Debug.LogError("Player is not in a room. Cannot instantiate player.");
+            //     return;
+            // }
+
+            // if (playerPrefab == null)
+            // {
+            //     Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
+            // }
+            // else  {
+            //     if (PlayerController.LocalPlayerInstance == null)
+            //     {
+            //         Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
+            //         // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
+            //         PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+            //     }
+            //     else
+            //     {
+            //         Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
+            //     }
+            // }
         }
 
-        #endregion
-
-        #region Photon Callbacks
-
-        /// Player leaves room, load main menu scene
+        // Player leaves room, send them back to main menu
         public override void OnLeftRoom()
         {
             SceneManager.LoadScene(0);

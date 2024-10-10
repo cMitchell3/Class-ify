@@ -19,29 +19,46 @@ public class PlayerController : MonoBehaviourPun
 
         if (photonView.IsMine)
         {
-            LocalPlayerInstance = gameObject;
+            PlayerController.LocalPlayerInstance = this.gameObject;
         }
         else {
             Destroy(audioListener);
         }
+
+        // DontDestroyOnLoad(this.gameObject);
     }
 
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        Camera mainCamera = Camera.main;
-
-        if (mainCamera != null)
+        // Check if this is the local player's instance
+        if (photonView.IsMine)
         {
-            if (photonView.IsMine)
+            // Ensure the local player's camera is active
+            Camera mainCamera = GetComponentInChildren<Camera>(true);
+            if (mainCamera != null)
             {
-                // If this player is the local player, set the Main Camera to follow it
-                mainCamera.transform.localPosition = new Vector3(0, 0, -10);
+                mainCamera.enabled = true;  // Enable the camera for the local player
+                AudioListener audioListener = mainCamera.GetComponent<AudioListener>();
+                if (audioListener != null)
+                {
+                    audioListener.enabled = true;  // Ensure audio listener is enabled for local player
+                }
             }
         }
         else
         {
-            Debug.LogError("Main Camera not found in the scene.");
+            // Disable the camera and audio listener for remote players
+            Camera otherCamera = GetComponentInChildren<Camera>(true);
+            if (otherCamera != null)
+            {
+                otherCamera.enabled = false;  // Disable the camera for remote players
+                AudioListener otherAudioListener = otherCamera.GetComponent<AudioListener>();
+                if (otherAudioListener != null)
+                {
+                    otherAudioListener.enabled = false;  // Disable the audio listener for remote players
+                }
+            }
         }
     }
 
