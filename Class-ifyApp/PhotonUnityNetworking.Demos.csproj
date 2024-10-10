@@ -111,8 +111,8 @@
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\DemoSlotRacer\Scripts\BezierCurve\BezierCurve.cs" />
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\PunCockpit\Scripts\Autonomous UI\DocLinkButton.cs" />
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\PunBasics-Tutorial\Scripts\PlayerManager.cs" />
-    <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\PunCockpit\Scripts\PropertyFields\UserIdField.cs" />
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\PunCockpit\Forms\ConnectToRegionUIForm.cs" />
+    <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\PunCockpit\Scripts\PropertyFields\UserIdField.cs" />
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\DemoSlotRacer\Scripts\BezierCurve\Bezier.cs" />
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\Shared Assets\Scripts\ThirdPersonCharacter.cs" />
     <Compile Include="Assets\Photon\PhotonUnityNetworking\Demos\DemoSlotRacer\Scripts\SlotRacerSplashScreen.cs" />
