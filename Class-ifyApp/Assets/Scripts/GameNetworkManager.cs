@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 using Photon.Pun;
 using Photon.Realtime;
 
-namespace Com.MyCompany.MyGame
+namespace Com.CS.Classify
 {
     public class GameManager : MonoBehaviourPunCallbacks
     {
@@ -20,6 +20,7 @@ namespace Com.MyCompany.MyGame
 
         #region Public Methods
 
+
         public void LeaveRoom()
         {
             Debug.Log("Leaving room");
@@ -30,11 +31,7 @@ namespace Com.MyCompany.MyGame
 
         #region Photon Callbacks
 
-        public void Start() {
-            while (!PhotonNetwork.InRoom) {
-
-            }
-
+        public void InstantiatePlayer() {
             Debug.Log("Current Room: " + PhotonNetwork.CurrentRoom);
 
             if (!PhotonNetwork.InRoom)
@@ -61,31 +58,8 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-        public override void OnJoinedRoom() {
-            // Debug.Log("Current Room: " + PhotonNetwork.CurrentRoom);
-
-            // if (!PhotonNetwork.InRoom)
-            // {
-            //     Debug.LogError("Player is not in a room. Cannot instantiate player.");
-            //     return;
-            // }
-
-            // if (playerPrefab == null)
-            // {
-            //     Debug.LogError("<Color=Red><a>Missing</a></Color> playerPrefab Reference. Please set it up in GameObject 'Game Manager'", this);
-            // }
-            // else  {
-            //     if (PlayerController.LocalPlayerInstance == null)
-            //     {
-            //         Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
-            //         // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-            //         PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
-            //     }
-            //     else
-            //     {
-            //         Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
-            //     }
-            // }
+        public void Start() {
+            InstantiatePlayer();
         }
 
         // Player leaves room, send them back to main menu

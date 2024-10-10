@@ -20,6 +20,7 @@ namespace Com.CS.Classify
         string tempRoomJoinCode = "A5B3";
 
         string gameVersion = "1";
+        public GameObject playerPrefab;
 
         #endregion
 
@@ -39,7 +40,7 @@ namespace Com.CS.Classify
             }
 
             // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
-            PhotonNetwork.AutomaticallySyncScene = true;
+            // PhotonNetwork.AutomaticallySyncScene = true;
         }
 
         /// MonoBehaviour method called on GameObject by Unity during initialization phase.
@@ -101,13 +102,13 @@ namespace Com.CS.Classify
             Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
 
             // We only load if we are the first player, else we rely on `PhotonNetwork.AutomaticallySyncScene` to sync our instance scene.
-            if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
-            {
+            // if (PhotonNetwork.CurrentRoom.PlayerCount == 1)
+            // {
                 Debug.Log("Loading RoomScene");
 
                 // Load the Room Level.
                 PhotonNetwork.LoadLevel("RoomScene");
-            }
+            // }
         }
 
         // Join room failed, create new room
