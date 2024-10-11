@@ -15,6 +15,7 @@ namespace Com.CS.Classify
         public Button joinRoomButton;
         public Button createRoomButton;
         public TMP_InputField roomCode;
+        public TextMeshProUGUI errorMessage;
         public GameObject playerPrefab;
         public LinearCongruentialGenerator codeGenerationLogic;
 
@@ -116,7 +117,15 @@ namespace Com.CS.Classify
         // Join room failed
          public override void OnJoinRoomFailed(short returnCode, string message)
         {
+            errorMessage.text = "room does not exist";
             Debug.Log("Unable to connect to room.");
+        }
+
+        // Create room failed
+         public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            errorMessage.text = "room code already in use";
+            Debug.Log("Unable to create room, room with same code already exists.");
         }
 
         // Connect to master successful
