@@ -17,6 +17,7 @@ namespace Com.CS.Classify
         public TMP_InputField roomCode;
         public GameObject playerPrefab;
         public LinearCongruentialGenerator codeGenerationLogic;
+        // public DataHolderMainMenu dataHolder;
 
         #endregion
 
@@ -49,6 +50,11 @@ namespace Com.CS.Classify
             {
                 Debug.LogError("codeGenerationLogic is not assigned in the Inspector.");
             }
+
+            // if (dataHolder != null)
+            // {
+            //     Debug.LogError("dataHolder is not assigned in the Inspector.");
+            // }
 
             Connect();
         }
@@ -85,15 +91,15 @@ namespace Com.CS.Classify
         /// When create room button is clicked, create a new room, otherwise throw error
         private void OnCreateRoomButtonClicked()
         {
-            string code = roomCode.text;
             if (PhotonNetwork.IsConnected)
             {
-                if (code == "") {
-                    code = codeGenerationLogic.Next().ToString();
+                if (roomCode.text == "") {
+                    roomCode.text = codeGenerationLogic.Next().ToString();
                 }
 
+                DataHolderMainMenu.Instance.UpdateSavedCode(roomCode.text);
                 RoomOptions roomOptions = new RoomOptions { MaxPlayers = 16 }; 
-                PhotonNetwork.CreateRoom(code, roomOptions);
+                PhotonNetwork.CreateRoom(roomCode.text, roomOptions);
             }
             else
             {

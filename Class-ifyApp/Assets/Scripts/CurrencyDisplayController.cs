@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
-public class CurrencyController : MonoBehaviour
+public class CurrencyDisplayController : MonoBehaviour
 {
     public TextMeshProUGUI tmpText;
 
