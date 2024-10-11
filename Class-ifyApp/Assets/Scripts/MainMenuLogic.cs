@@ -26,4 +26,9 @@ public class MainMenuLogic : MonoBehaviour
     {
         SceneManager.LoadScene("ShopScene");
     }
+
+    public void CharacterButton()
+    {
+        SceneManager.LoadScene("InventoryMenu");
+    }
 }
