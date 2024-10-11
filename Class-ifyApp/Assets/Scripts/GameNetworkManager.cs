@@ -3,6 +3,7 @@ using System.Collections;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 using Photon.Pun;
 using Photon.Realtime;
@@ -15,6 +16,7 @@ namespace Com.CS.Classify
 
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
+        public Button leaveRoomButton;
 
         #endregion
 
@@ -30,6 +32,15 @@ namespace Com.CS.Classify
         #endregion
 
         #region MonoBehaviour CallBacks
+
+        // Called in early initialization phase, sets up button listeners
+        void Awake()
+        {
+            if (leaveRoomButton != null)
+            {
+                leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
+            }
+        }
 
         // Called when script is loaded, instantiates player
         public void Start() {
@@ -63,6 +74,12 @@ namespace Com.CS.Classify
                     Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
                 }
             }
+        }
+
+        /// When leave room button is clicked, leave room
+        private void OnLeaveRoomButtonClicked()
+        {
+            LeaveRoom();
         }
 
         #endregion
