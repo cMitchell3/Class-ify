@@ -13,6 +13,7 @@ public class PlayerController : MonoBehaviourPun
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
     private AudioListener audioListener;
+    private Camera mainCamera;
 
     // Initialize local player instance if this is an instance of the local player
     void Awake() {
@@ -30,34 +31,43 @@ public class PlayerController : MonoBehaviourPun
         rb = GetComponent<Rigidbody2D>();
 
         // Enable local player's camera and audio listener
-        if (photonView.IsMine)
+        // Make the camera a child of this player
+        GameObject mainCamera = GameObject.Find("MainCamera");
+        if (mainCamera != null)
         {
-            Camera mainCamera = GetComponentInChildren<Camera>(true);
-            if (mainCamera != null)
-            {
-                mainCamera.enabled = true; 
+            mainCamera.transform.SetParent(transform);
+            mainCamera.transform.localPosition = new Vector3(0, 1, -10); // Adjust offset as needed
+            mainCamera.transform.localRotation = Quaternion.identity; // Reset rotation
+        }
 
-                AudioListener audioListener = mainCamera.GetComponent<AudioListener>();
-                if (audioListener != null)
-                {
-                    audioListener.enabled = true;
-                }
-            }
-        }
-        else
-        {
-            // Locally disable the camera and audio listener for other players' prefabs
-            Camera otherCamera = GetComponentInChildren<Camera>(true);
-            if (otherCamera != null)
-            {
-                otherCamera.enabled = false;
-                AudioListener otherAudioListener = otherCamera.GetComponent<AudioListener>();
-                if (otherAudioListener != null)
-                {
-                    otherAudioListener.enabled = false;
-                }
-            }
-        }
+        // if (photonView.IsMine)
+        // {
+        //     Camera mainCamera = GetComponentInChildren<Camera>(true);
+        //     if (mainCamera != null)
+        //     {
+        //         mainCamera.enabled = true; 
+
+        //         AudioListener audioListener = mainCamera.GetComponent<AudioListener>();
+        //         if (audioListener != null)
+        //         {
+        //             audioListener.enabled = true;
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     // Locally disable the camera and audio listener for other players' prefabs
+        //     Camera otherCamera = GetComponentInChildren<Camera>(true);
+        //     if (otherCamera != null)
+        //     {
+        //         otherCamera.enabled = false;
+        //         AudioListener otherAudioListener = otherCamera.GetComponent<AudioListener>();
+        //         if (otherAudioListener != null)
+        //         {
+        //             otherAudioListener.enabled = false;
+        //         }
+        //     }
+        // }
     }
 
     // Check if this is local player's instance, if so enable movement, otherwise do nothing
