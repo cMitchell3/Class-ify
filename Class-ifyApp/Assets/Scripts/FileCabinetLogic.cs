@@ -5,21 +5,34 @@ using UnityEngine.EventSystems;
 
 public class FileCabinetLogic : MonoBehaviour
 {
-    public GameObject fileCabinetMenu;
-    public GameObject playerController;
+    public GameObject fileCabinetObject;
+   public GameObject playerController;
 
 
-    public void ActivateFileCabinetMenu()
+    public void ActivateFileCabinet()
     {
-
-        fileCabinetMenu.SetActive(!fileCabinetMenu.activeSelf);
-        playerController.GetComponent<PlayerController>().enabled = false;
+        fileCabinetObject.SetActive(!fileCabinetObject.activeSelf);
+        EnablePlayerMovement(false);
     }
 
     public void Back()
     {
-        fileCabinetMenu.SetActive(false);
+        fileCabinetObject.SetActive(false);
         EventSystem.current.SetSelectedGameObject(null);
-        playerController.GetComponent<PlayerController>().enabled = true;
+        EnablePlayerMovement(true);
+    }
+
+    private void EnablePlayerMovement(bool isEnabled)
+    {
+        PlayerController[] players = FindObjectsOfType<PlayerController>();
+        
+        foreach (var player in players)
+        {
+            if (player.photonView.IsMine)
+            {
+                player.setMovementEnabled(isEnabled);
+                break;
+            }
+        }
     }
 }
