@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 using Photon.Pun;
 using Photon.Realtime;
+
+using TMPro;
 
 namespace Com.CS.Classify
 {
@@ -11,14 +14,12 @@ namespace Com.CS.Classify
 
         public Button joinRoomButton;
         public Button createRoomButton;
-        //public InputField roomJoinCode;
+        public TMP_InputField roomCode;
         public GameObject playerPrefab;
 
         #endregion
 
         #region Private Fields
-        
-        string tempRoomJoinCode = "A5B3";
 
         string gameVersion = "1";
 
@@ -66,8 +67,8 @@ namespace Com.CS.Classify
         {
             if (PhotonNetwork.IsConnected)
             {
-                Debug.Log("Joining room " + tempRoomJoinCode);
-                PhotonNetwork.JoinRoom(tempRoomJoinCode); // TODO update to include actual room code input field
+                Debug.Log("Joining room " + roomCode.text);
+                PhotonNetwork.JoinRoom(roomCode.text);
             }
             else
             {
@@ -81,7 +82,7 @@ namespace Com.CS.Classify
             if (PhotonNetwork.IsConnected)
             {
                 RoomOptions roomOptions = new RoomOptions { MaxPlayers = 16 }; 
-                PhotonNetwork.CreateRoom(tempRoomJoinCode, roomOptions); // TODO update to include actual room code input field
+                PhotonNetwork.CreateRoom(roomCode.text, roomOptions);
             }
             else
             {
