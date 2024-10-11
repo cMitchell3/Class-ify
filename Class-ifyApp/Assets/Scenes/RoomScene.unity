@@ -7136,7 +7136,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   whiteboardObject: {fileID: 504925054}
-  playerController: {fileID: 7955323815544713653, guid: eb1c2a5f41cfaf440817f2812a0eeb0e, type: 3}
 --- !u!4 &464780196
 Transform:
   m_ObjectHideFlags: 0
@@ -10183,12 +10182,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1258514910}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04e743a76ffae6b4b8d33c1ef4e42e93, type: 3}
+  m_Script: {fileID: 11500000, guid: 590c35f77bc8bf346aad58b6b70eeabc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 0}
+  distance: 7
+  height: 3
   smoothSpeed: 0.125
-  offset: {x: 0, y: 0, z: 0}
 --- !u!1 &1261355265
 GameObject:
   m_ObjectHideFlags: 0

@@ -27,18 +27,18 @@ public class PlayerController : MonoBehaviourPun
         }
     }
 
-    // Check if this is the local player's instance, if so enable main camera and audio listener, otherwise disable them
+    // Check if this is the local player's instance, if so have camera follow them
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
 
-        // Make the camera a child of this player
-        GameObject mainCamera = GameObject.Find("MainCamera");
-        if (mainCamera != null)
+        if (photonView.IsMine)
         {
-            mainCamera.transform.SetParent(transform);
-            mainCamera.transform.localPosition = new Vector3(0, 1, -10);
-            mainCamera.transform.localRotation = Quaternion.identity;
+            SimpleCameraController cameraFollow = Camera.main.GetComponent<SimpleCameraController>();
+            if (cameraFollow != null)
+            {
+                cameraFollow.SetTarget(transform);
+            }
         }
     }
 
