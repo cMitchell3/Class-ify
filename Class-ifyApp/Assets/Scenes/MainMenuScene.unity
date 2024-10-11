@@ -221,6 +221,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   joinRoomButton: {fileID: 2036006773}
   createRoomButton: {fileID: 1821893901}
+  playerPrefab: {fileID: 7955323815544713653, guid: eb1c2a5f41cfaf440817f2812a0eeb0e, type: 3}
 --- !u!4 &348813913
 Transform:
   m_ObjectHideFlags: 0
