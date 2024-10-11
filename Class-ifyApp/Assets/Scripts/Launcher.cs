@@ -1,7 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
+
 using Photon.Pun;
 using Photon.Realtime;
+
+using TMPro;
 
 namespace Com.CS.Classify
 {
@@ -11,13 +14,12 @@ namespace Com.CS.Classify
 
         public Button joinRoomButton;
         public Button createRoomButton;
-        //public InputField roomJoinCode;
+        public TMP_InputField roomCode;
+        public GameObject playerPrefab;
 
         #endregion
 
         #region Private Fields
-        
-        string tempRoomJoinCode = "A5B3";
 
         string gameVersion = "1";
 
@@ -25,7 +27,7 @@ namespace Com.CS.Classify
 
         #region MonoBehaviour CallBacks
 
-        /// MonoBehaviour method called on GameObject by Unity during early initialization phase.
+        // Called during early initialization, sets up listeners for join and create room buttons
         void Awake()
         {
             if (joinRoomButton != null)
@@ -37,12 +39,9 @@ namespace Com.CS.Classify
             {
                 createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
             }
-
-            // this makes sure we can use PhotonNetwork.LoadLevel() on the master client and all clients in the same room sync their level automatically
-            PhotonNetwork.AutomaticallySyncScene = true;
         }
 
-        /// MonoBehaviour method called on GameObject by Unity during initialization phase.
+        // Called when script is loaded, connects to master server
         void Start()
         {
             Connect();
@@ -63,13 +62,13 @@ namespace Com.CS.Classify
             }
         }
 
-        /// When join room button is clicked, connect to room (temporary implementation for testing)
+        /// When join room button is clicked, join to room, otherwise throw error
         private void OnJoinRoomButtonClicked()
-        // NOTE: This will give an error right now because create room automatically joins the room but we do not have a scene set up yet where I can send the user once they join
         {
             if (PhotonNetwork.IsConnected)
             {
-                PhotonNetwork.JoinRoom(tempRoomJoinCode); // TODO update to include actual room code input field
+                Debug.Log("Joining room " + roomCode.text);
+                PhotonNetwork.JoinRoom(roomCode.text);
             }
             else
             {
@@ -77,14 +76,13 @@ namespace Com.CS.Classify
             }
         }
 
-        /// When create room button is clicked, create a new room (temporary implementation for testing)
+        /// When create room button is clicked, create a new room, otherwise throw error
         private void OnCreateRoomButtonClicked()
         {
             if (PhotonNetwork.IsConnected)
             {
-
                 RoomOptions roomOptions = new RoomOptions { MaxPlayers = 16 }; 
-                PhotonNetwork.CreateRoom(tempRoomJoinCode, roomOptions); // TODO update to include actual room code input field
+                PhotonNetwork.CreateRoom(roomCode.text, roomOptions);
             }
             else
             {
@@ -96,13 +94,15 @@ namespace Com.CS.Classify
 
         #region MonoBehaviourPunCallbacks Callbacks
 
-        // Join room successful
+        // After joining a room, load classroom scene
         public override void OnJoinedRoom()
         {
-            Debug.Log("Successfully joined a room: " + PhotonNetwork.CurrentRoom.Name);
+            Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
+
+            PhotonNetwork.LoadLevel("RoomScene");
         }
 
-        // Join room failed, create new room
+        // Join room failed
          public override void OnJoinRoomFailed(short returnCode, string message)
         {
             Debug.Log("Unable to connect to room.");
