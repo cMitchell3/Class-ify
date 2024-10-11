@@ -17,7 +17,6 @@ namespace Com.CS.Classify
         public TMP_InputField roomCode;
         public GameObject playerPrefab;
         public LinearCongruentialGenerator codeGenerationLogic;
-        // public DataHolderMainMenu dataHolder;
 
         #endregion
 
@@ -29,9 +28,11 @@ namespace Com.CS.Classify
 
         #region MonoBehaviour CallBacks
 
-        // Called during early initialization, sets up listeners for join and create room buttons
+        // Called during early initialization, connects to master server, sets up listeners for join and create room buttons
         void Awake()
         {
+            Connect();
+
             if (joinRoomButton != null)
             {
                 joinRoomButton.onClick.AddListener(OnJoinRoomButtonClicked);
@@ -43,20 +44,13 @@ namespace Com.CS.Classify
             }
         }
 
-        // Called when script is loaded, connects to master server
+        // Called when script is loaded, logs errors
         void Start()
         {
             if (codeGenerationLogic == null)
             {
                 Debug.LogError("codeGenerationLogic is not assigned in the Inspector.");
             }
-
-            // if (dataHolder != null)
-            // {
-            //     Debug.LogError("dataHolder is not assigned in the Inspector.");
-            // }
-
-            Connect();
         }
 
         #endregion

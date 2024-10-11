@@ -7136,6 +7136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   whiteboardObject: {fileID: 504925054}
+  playerController: {fileID: 7955323815544713653, guid: eb1c2a5f41cfaf440817f2812a0eeb0e, type: 3}
 --- !u!4 &464780196
 Transform:
   m_ObjectHideFlags: 0
@@ -7424,8 +7425,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 464780195}
-        m_TargetAssemblyTypeName: WhiteboardLogic, Assembly-CSharp
+      - m_Target: {fileID: 571355024}
+        m_TargetAssemblyTypeName: FileCabinetLogic, Assembly-CSharp
         m_MethodName: Back
         m_Mode: 1
         m_Arguments:
@@ -7485,7 +7486,7 @@ GameObject:
   - component: {fileID: 571355025}
   - component: {fileID: 571355024}
   m_Layer: 0
-  m_Name: fileCabinetLogic
+  m_Name: FileCabinetLogic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7504,6 +7505,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   fileCabinetObject: {fileID: 352600250}
+  playerController: {fileID: 7955323815544713653, guid: eb1c2a5f41cfaf440817f2812a0eeb0e, type: 3}
 --- !u!4 &571355025
 Transform:
   m_ObjectHideFlags: 0
