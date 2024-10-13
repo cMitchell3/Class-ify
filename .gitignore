@@ -22,7 +22,7 @@ Class-ifyApp/[Aa]ssets/Plugins/Editor/JetBrains*
 
 # https://github-wiki-see.page/m/interaction-lab/MoveToCode/wiki/Firebase-Setup
 Class-ifyApp/[Aa]ssets/Data*
-Class-ifyApp/[Aa]ssets/Firebase*
+#Class-ifyApp/[Aa]ssets/Firebase*
 
 # Visual Studio cache directory
 Class-ifyApp/.vs/
@@ -74,12 +74,12 @@ Class-ifyApp/[Aa]ssets/[Ss]treamingAssets/aa/*
 
 # Google Mechahamster .gitignore: Latest at https://github.com/google/mechahamster/blob/master/.gitignore
 # Firebase stuff
-Class-ifyApp/Assets/Firebase/
-Class-ifyApp/Assets/PlayServicesResolver/
-Class-ifyApp/Assets/Editor\ Default\ Resources/
-Class-ifyApp/Assets/Firebase.meta
-Class-ifyApp/Assets/PlayServicesResolver.meta
-Class-ifyApp/Assets/Editor\ Default\ Resources.meta
+#Class-ifyApp/Assets/Firebase/
+#Class-ifyApp/Assets/PlayServicesResolver/
+#Class-ifyApp/Assets/Editor\ Default\ Resources/
+#Class-ifyApp/Assets/Firebase.meta
+#Class-ifyApp/Assets/PlayServicesResolver.meta
+#Class-ifyApp/Assets/Editor\ Default\ Resources.meta
 Class-ifyApp/Assets/Plugins/Android/android.arch.*
 Class-ifyApp/Assets/Plugins/Android/com.android.*
 Class-ifyApp/Assets/Plugins/Android/com.crashlytics.*
@@ -115,9 +115,9 @@ Class-ifyApp/ProjectSettings/GvhProjectSettings.xml
 
 # Credential files:
 **/GoogleService-Info*.plist*
-**/google-services*.json*
-Class-ifyApp/Assets/StreamingAssets*
-Class-ifyApp/Assets/StreamingAssets/
+#**/google-services*.json*
+#Class-ifyApp/Assets/StreamingAssets*
+#Class-ifyApp/Assets/StreamingAssets/
 
 # Keystore
 *.keystore
@@ -130,9 +130,9 @@ Class-ifyApp/docs/html/
 
 # Firebase CLI
 **/node_modules/*
-**/npm-debug.log
-Class-ifyApp/console/.firebaserc
-Class-ifyApp/console/firebase-debug.log
+#**/npm-debug.log
+#Class-ifyApp/console/.firebaserc
+#Class-ifyApp/console/firebase-debug.log
 
 # Visual Studio
 Class-ifyApp/.vs
@@ -177,8 +177,8 @@ Class-ifyApp/omnisharp.json
 # Plugins: Consider making this more specific/narrower if you use plugins beyond/on top of Firebase ones.
 ###
 Class-ifyApp/Assets/GoogleMobileAds*
-Class-ifyApp/Assets/ExternalDependencyManager/
-Class-ifyApp/Assets/ExternalDependencyManager*
+#Class-ifyApp/Assets/ExternalDependencyManager/
+#Class-ifyApp/Assets/ExternalDependencyManager*
 Class-ifyApp/Assets/Plugins/Android*
 Class-ifyApp/Assets/Plugins/iOS*
 Class-ifyApp/Assets/Plugins/Android/

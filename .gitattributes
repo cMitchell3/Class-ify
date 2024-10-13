@@ -1,0 +1,2 @@
+Class-ifyApp/Assets/Firebase/Plugins/x86_64 filter=lfs diff=lfs merge=lfs -text
+Class-ifyApp/Assets/Firebase/Plugins/x86_64/* filter=lfs diff=lfs merge=lfs -text
