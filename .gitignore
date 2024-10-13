@@ -115,7 +115,7 @@ Class-ifyApp/ProjectSettings/GvhProjectSettings.xml
 
 # Credential files:
 **/GoogleService-Info*.plist*
-**/google-services*.json*
+#**/google-services*.json*
 #Class-ifyApp/Assets/StreamingAssets*
 #Class-ifyApp/Assets/StreamingAssets/
 
