@@ -32,16 +32,10 @@ public class LoginInputManager : MonoBehaviour
     public TMP_Text warningLoginText;
 
 
-    /*
-    void Start()
-    {
-        passwordInputField.contentType = TMP_InputField.ContentType.Password;
-    }
-    */
-
-
     private void Awake()
     {
+        passwordInputField.contentType = TMP_InputField.ContentType.Password;
+
         FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task => {
 
             dependencyStatus = task.Result;
