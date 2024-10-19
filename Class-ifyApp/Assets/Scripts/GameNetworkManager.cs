@@ -90,7 +90,7 @@ namespace Com.CS.Classify
         // After player leaves room, send them to main menu scene
         public override void OnLeftRoom()
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene("MainMenuScene");
         }
 
         // When another player enters the room, log information, instantiate them if local
