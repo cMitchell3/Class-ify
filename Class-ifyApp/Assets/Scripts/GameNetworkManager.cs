@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
+
 namespace Com.CS.Classify
 {
     public class GameManager : MonoBehaviourPunCallbacks
