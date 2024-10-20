@@ -125,17 +125,21 @@ namespace Com.CS.Classify
         private async void OnCreateRoomButtonClicked()
         {
             roomCodeText = roomCode.text;
+            bool randomCodeFlag = false;
             if (PhotonNetwork.IsConnected)
             {   
                 if (roomCode.text == "")
                 {
-                    roomCode.text = codeGenerationLogic.Next().ToString();
+                    codeGenerationLogic.RandomizeSeed();
+                    roomCodeText = codeGenerationLogic.Next().ToString();
+                    randomCodeFlag = true;
                 }
+
 
                 bool exists = await DoesRoomExistAsync();
                 if (exists)
                 {
-                    FailCreateRoom();
+                    FailCreateRoom(randomCodeFlag);
                 }
                 else
                 {
@@ -233,10 +237,18 @@ namespace Com.CS.Classify
 
 
         // Failed to create room due to room code already existing
-        private void FailCreateRoom()
+        private void FailCreateRoom(bool randomCodeFlag)
         {
-            errorMessage.text = "room code already in use";
-            Debug.Log("Unable to create room, room with same code already exists.");
+            if (randomCodeFlag)
+            {
+                roomCodeText = "";
+                OnCreateRoomButtonClicked();
+            }
+            else
+            {
+                errorMessage.text = "room code already in use";
+                Debug.Log("Unable to create room, room with same code already exists.");
+            }
         }
 
         // Join a room
@@ -285,7 +297,7 @@ namespace Com.CS.Classify
         // Called on create room failed
         public override void OnCreateRoomFailed(short returnCode, string message)
         {
-            FailCreateRoom();
+            FailCreateRoom(false);
         }
 
         // Called on connect to master successful
