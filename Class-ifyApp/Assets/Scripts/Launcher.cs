@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Photon.Pun;
@@ -36,6 +37,7 @@ namespace Com.CS.Classify
         private FirebaseUser user;
         string gameVersion = "1";
         string roomCodeText;
+        // private SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         #endregion
 
@@ -45,10 +47,14 @@ namespace Com.CS.Classify
         void Awake()
         {
             db = FirebaseFirestore.DefaultInstance;
-
+            
             if (db == null) 
             {
                 Debug.LogError("Error: Failed to connect to Firestore.");
+            }
+            else
+            {
+                Debug.Log("Connected to Firestore");
             }
 
             auth = FirebaseAuth.DefaultInstance;
