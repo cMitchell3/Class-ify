@@ -5863,7 +5863,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &149111263
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10215,7 +10215,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   distance: 7
-  height: 3
   smoothSpeed: 0.125
 --- !u!1 &1261355265
 GameObject:

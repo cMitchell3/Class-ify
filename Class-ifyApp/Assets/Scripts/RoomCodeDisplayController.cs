@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -14,12 +15,10 @@ public class RoomCodeDisplayController : MonoBehaviour
         if (DataHolderMainMenu.Instance != null)
         {
             joinCode = DataHolderMainMenu.Instance.savedCode;
-
-            Debug.Log("The saved room code is: " + joinCode);
         }
         else
         {
-            Debug.LogError("DataHolderMainMenu instance is null! Make sure it's present in the main menu scene.");
+            Debug.LogError("DataHolderMainMenu instance is null.");
         }
 
         if (tmpText == null)

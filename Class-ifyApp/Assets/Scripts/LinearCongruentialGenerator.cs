@@ -17,6 +17,20 @@ namespace Com.CS.Classify{
             seed = (a * seed + c) % m;
             return seed;
         }
+
+        // New method to randomize the seed
+        public void RandomizeSeed()
+        {
+            // Use the current time in ticks and limit the seed to a 10-digit number
+            long ticks = System.DateTime.Now.Ticks;
+            seed = ticks % 10000000000; // Keeps the seed within a 10-digit range
+
+            // Ensure the seed is positive
+            if (seed < 0)
+            {
+                seed = -seed;
+            }
+        }
     }
 
     // Code for testing Room Code generation
