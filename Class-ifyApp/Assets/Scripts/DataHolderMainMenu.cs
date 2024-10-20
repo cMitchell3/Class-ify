@@ -20,10 +20,9 @@ public class DataHolderMainMenu : MonoBehaviour
         }
     }
 
-    // Update the savedText when code updates
+    // Update the room join code
     public void UpdateSavedCode(string newCode)
     {
-        Debug.Log("Saved code: " + newCode);
         savedCode = newCode;
     }
 }

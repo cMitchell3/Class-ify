@@ -1,8 +1,10 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 using Photon.Pun;
 using Photon.Realtime;
@@ -33,6 +35,7 @@ namespace Com.CS.Classify
         private FirebaseAuth auth;
         private FirebaseUser user;
         string gameVersion = "1";
+        string roomCodeText;
 
         #endregion
 
@@ -43,8 +46,23 @@ namespace Com.CS.Classify
         {
             db = FirebaseFirestore.DefaultInstance;
 
+            if (db == null) 
+            {
+                Debug.LogError("Error: Failed to connect to Firestore.");
+            }
+
             auth = FirebaseAuth.DefaultInstance;
             user = auth.CurrentUser;
+
+            if (auth == null)
+            {
+                Debug.LogError("Error: Failed to connected to Firebase Auth");
+            }
+
+            if (user == null)
+            {
+                Debug.LogError("Error: User not logged in.");
+            }
 
             Connect();
 
@@ -64,7 +82,7 @@ namespace Com.CS.Classify
         {
             if (codeGenerationLogic == null)
             {
-                Debug.LogError("codeGenerationLogic is not assigned in the Inspector.");
+                Debug.LogError("Error: codeGenerationLogic is not assigned in the Inspector.");
             }
         }
 
@@ -86,9 +104,9 @@ namespace Com.CS.Classify
         /// When join room button is clicked, join to room, otherwise throw error
         private void OnJoinRoomButtonClicked()
         {
+            roomCodeText = roomCode.text;
             if (PhotonNetwork.IsConnected)
             {
-                Debug.Log("Joining room " + roomCode.text);
                 PhotonNetwork.JoinRoom(roomCode.text);
             }
             else
@@ -98,17 +116,27 @@ namespace Com.CS.Classify
         }
 
         /// When create room button is clicked, create a new room, otherwise throw error
-        private void OnCreateRoomButtonClicked()
+        private async void OnCreateRoomButtonClicked()
         {
+            roomCodeText = roomCode.text;
             if (PhotonNetwork.IsConnected)
-            {
-                if (roomCode.text == "") {
+            {   
+                if (roomCode.text == "")
+                {
                     roomCode.text = codeGenerationLogic.Next().ToString();
                 }
 
-                DataHolderMainMenu.Instance.UpdateSavedCode(roomCode.text);
-                RoomOptions roomOptions = new RoomOptions { MaxPlayers = 16 }; 
-                PhotonNetwork.CreateRoom(roomCode.text, roomOptions);
+                bool exists = await DoesRoomExistAsync();
+                if (exists)
+                {
+                    FailCreateRoom();
+                }
+                else
+                {
+                    //TODO change to reflect user input when creating room
+                    InitRoomData(16);
+                    CreateRoom(16);
+                }
             }
             else
             {
@@ -116,54 +144,151 @@ namespace Com.CS.Classify
             }
         }
 
-        #endregion
-
-        #region MonoBehaviourPunCallbacks Callbacks
-
-        // After joining a room, load classroom scene
-        public override void OnJoinedRoom()
+        // Check if a room exists in Firestore
+        private async Task<bool> DoesRoomExistAsync()
         {
-            Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
+            DocumentReference docRef = db.Collection("room").Document(roomCodeText);
 
-            PhotonNetwork.LoadLevel("RoomScene");
+            try
+            {
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                return snapshot.Exists;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error: Failed to check for room document: " + ex.Message);
+                return false;
+            }
         }
 
-        // Join room failed
-         public override void OnJoinRoomFailed(short returnCode, string message)
-        {
-            errorMessage.text = "room does not exist";
-            Debug.Log("Unable to connect to room.");
-        }
 
-        // Create room succeeded
-        public override void OnCreatedRoom()
+        // Initialize or re-initialize room data from Firestore
+        private void InitRoomData(int maxPlayers)
         {
-            Debug.Log("Created room with host " + user.Email);
-
-            DocumentReference docRef = db.Collection("room").Document(roomCode.text);
+            DocumentReference docRef = db.Collection("room").Document(roomCodeText);
             Dictionary<string, object> room = new Dictionary<string, object>
             {
                 { "Host", user.Email },
+                { "MaxPlayers", maxPlayers },
             };
             docRef.SetAsync(room).ContinueWithOnMainThread(task => {
                 Debug.Log("Initialized room data in Firestore");
             });
+
+            Debug.Log("Created room with host " + user.Email);
         }
 
-        // Create room failed
-        public override void OnCreateRoomFailed(short returnCode, string message)
+        #endregion
+
+        #region Custom Callbacks
+
+        // Create a room with specified parameters
+        private void CreateRoom(int maxPlayers)
+        {
+            DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
+            RoomOptions roomOptions = new RoomOptions { MaxPlayers = maxPlayers };
+            PhotonNetwork.CreateRoom(roomCodeText, roomOptions);
+
+            Debug.Log("(Re-)Created room with player limit of " + maxPlayers + ".");
+        }
+
+        private async void RejoinRoom()
+        {
+            DocumentSnapshot snapshot = await GetRoomDataAsync();
+            int maxPlayers = snapshot.TryGetValue("MaxPlayers", out int maxPlayersValue) ? maxPlayersValue : 16;
+
+            CreateRoom(maxPlayers);   
+        }
+
+        private async Task<DocumentSnapshot> GetRoomDataAsync()
+        {
+            DocumentReference docRef = db.Collection("room").Document(roomCodeText);
+            
+            try
+            {
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                
+                if (snapshot.Exists)
+                {
+                    return snapshot;
+                }
+                else
+                {
+                    Debug.LogError("Document does not exist.");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error: Failed to check for room document: " + ex.Message);
+                return null;
+            }
+        }
+
+
+        // Failed to create room due to room code already existing
+        private void FailCreateRoom()
         {
             errorMessage.text = "room code already in use";
             Debug.Log("Unable to create room, room with same code already exists.");
         }
 
-        // Connect to master successful
+        // Join a room
+        private void JoinRoom()
+        {
+            Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
+            PhotonNetwork.LoadLevel("RoomScene");
+        }
+
+        // Fail to join a room because it does not exist
+        private void FailJoinRoom()
+        {
+            errorMessage.text = "room does not exist";
+            Debug.Log("Unable to connect to room.");
+        }
+
+        #endregion
+
+        #region MonoBehaviourPunCallbacks Callbacks
+
+        // Called on join room success
+        public override void OnJoinedRoom()
+        {
+            JoinRoom();
+        }
+
+        // Called on join room failed
+        public override async void OnJoinRoomFailed(short returnCode, string message)
+        {
+            bool exists = await DoesRoomExistAsync();
+            if (exists)
+            {
+                RejoinRoom();
+            }
+            else
+            {
+                FailJoinRoom();
+            }
+        }
+
+        // Called on create room success
+        public override void OnCreatedRoom()
+        {
+        }
+
+        // Called on create room failed
+        public override void OnCreateRoomFailed(short returnCode, string message)
+        {
+            FailCreateRoom();
+        }
+
+        // Called on connect to master successful
         public override void OnConnectedToMaster()
         {
             Debug.Log("PUN Basics Launcher: OnConnectedToMaster() was called by PUN");
         }
 
-        // Disconnected from master
+        // Called on disconnected from master
         public override void OnDisconnected(DisconnectCause cause)
         {
             Debug.LogWarningFormat("PUN Basics Launcher: OnDisconnected() was called by PUN with reason {0}", cause);
