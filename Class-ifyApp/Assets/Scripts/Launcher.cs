@@ -1,10 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using System.Collections;
+using System.Collections.Generic;
+
 using Photon.Pun;
 using Photon.Realtime;
 
 using TMPro;
+
+using Firebase.Auth;
+using Firebase.Firestore;
+using Firebase.Extensions;
 
 namespace Com.CS.Classify
 {
@@ -22,7 +29,9 @@ namespace Com.CS.Classify
         #endregion
 
         #region Private Fields
-
+        private FirebaseFirestore db;
+        private FirebaseAuth auth;
+        private FirebaseUser user;
         string gameVersion = "1";
 
         #endregion
@@ -32,6 +41,11 @@ namespace Com.CS.Classify
         // Called during early initialization, connects to master server, sets up listeners for join and create room buttons
         void Awake()
         {
+            db = FirebaseFirestore.DefaultInstance;
+
+            auth = FirebaseAuth.DefaultInstance;
+            user = auth.CurrentUser;
+
             Connect();
 
             if (joinRoomButton != null)
@@ -121,8 +135,23 @@ namespace Com.CS.Classify
             Debug.Log("Unable to connect to room.");
         }
 
+        // Create room succeeded
+        public override void OnCreatedRoom()
+        {
+            Debug.Log("Created room with host " + user.Email);
+
+            DocumentReference docRef = db.Collection("room").Document(roomCode.text);
+            Dictionary<string, object> room = new Dictionary<string, object>
+            {
+                { "Host", user.Email },
+            };
+            docRef.SetAsync(room).ContinueWithOnMainThread(task => {
+                Debug.Log("Initialized room data in Firestore");
+            });
+        }
+
         // Create room failed
-         public override void OnCreateRoomFailed(short returnCode, string message)
+        public override void OnCreateRoomFailed(short returnCode, string message)
         {
             errorMessage.text = "room code already in use";
             Debug.Log("Unable to create room, room with same code already exists.");
