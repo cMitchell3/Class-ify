@@ -98,7 +98,7 @@ namespace Com.CS.Classify
         public override void OnPlayerEnteredRoom(Player other)
         {
             // Not seen if you're player joining
-            Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName);
+            Debug.LogFormat("OnPlayerEnteredRoom() " + other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {
