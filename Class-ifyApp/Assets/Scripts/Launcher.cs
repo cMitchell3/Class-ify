@@ -195,7 +195,6 @@ namespace Com.CS.Classify
         // Create a room with specified parameters
         private void CreateRoom(int maxPlayers)
         {
-            DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
             RoomOptions roomOptions = new RoomOptions { MaxPlayers = maxPlayers };
             PhotonNetwork.CreateRoom(roomCodeText, roomOptions);
 
@@ -254,6 +253,7 @@ namespace Com.CS.Classify
         // Join a room
         private void JoinRoom()
         {
+            DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
             Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
             PhotonNetwork.LoadLevel("RoomScene");
         }
