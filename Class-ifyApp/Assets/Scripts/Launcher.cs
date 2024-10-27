@@ -255,6 +255,7 @@ namespace Com.CS.Classify
         {
             DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
             Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
+            PhotonNetwork.NickName = user.Email;
             PhotonNetwork.LoadLevel("RoomScene");
         }
 
