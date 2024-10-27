@@ -4,9 +4,10 @@ using UnityEngine.UI;
 public class WhiteboardDrawing : MonoBehaviour
 {
     public Color drawColor = Color.black;
-    public Color previousColor;
+    public Color previousColor = Color.black;
     public int brushSize = 4; // Increased for smoother lines
     public float brushSoftness = 0.5f; // Controls the softness of the brush edges
+    private bool isEraserMode = false;
 
     private Texture2D drawTexture;
     private RectTransform rectTransform;
@@ -125,14 +126,30 @@ public class WhiteboardDrawing : MonoBehaviour
         brushSoftness = Mathf.Clamp01(newSoftness);
     }
 
+    private bool AreColorsEqual(Color color1, Color color2, float tolerance = 0.01f)
+    {
+        return Mathf.Abs(color1.r - color2.r) < tolerance &&
+               Mathf.Abs(color1.g - color2.g) < tolerance &&
+               Mathf.Abs(color1.b - color2.b) < tolerance &&
+               Mathf.Abs(color1.a - color2.a) < tolerance;
+    }
+
     public void SetEraser()
     {
-        previousColor = drawColor;
-        SetDrawColor(Color.white);
+        if (!isEraserMode)
+        {
+            previousColor = drawColor; // Save the current drawing color
+            SetDrawColor(Color.white); // Switch to eraser color
+            isEraserMode = true; // Track that eraser mode is active
+        }
     }
 
     public void SetPencil()
     {
-        drawColor = previousColor;
+        if (isEraserMode)
+        {
+            SetDrawColor(previousColor); // Restore the previous drawing color
+            isEraserMode = false; // Switch back to pencil mode
+        }
     }
 }
