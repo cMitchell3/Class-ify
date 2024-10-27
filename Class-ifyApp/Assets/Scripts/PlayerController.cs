@@ -27,7 +27,7 @@ public class PlayerController : MonoBehaviourPun
         }
     }
 
-    // Check if this is the local player's instance, if so have camera follow them
+    // Check if this is the local player's instance, if so have camera follow them, and attatch camera to player nametag canvas
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -38,6 +38,27 @@ public class PlayerController : MonoBehaviourPun
             if (cameraFollow != null)
             {
                 cameraFollow.SetTarget(transform);
+            }
+
+            Canvas canvas = GetComponentInChildren<Canvas>();
+
+            if (canvas != null)
+            {
+                Camera mainCamera = Camera.main;
+
+                if (mainCamera != null)
+                {
+                    canvas.renderMode = RenderMode.WorldSpace;
+                    canvas.worldCamera = mainCamera;
+                }
+                else
+                {
+                    Debug.LogError("Main camera not found. Make sure there is a camera tagged as MainCamera in the scene.");
+                }
+            }
+            else
+            {
+                Debug.LogError("Canvas component not found on the name tag.");
             }
         }
     }

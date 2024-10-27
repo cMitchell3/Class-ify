@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
+using TMPro;
 
 namespace Com.CS.Classify
 {
@@ -67,14 +68,32 @@ namespace Com.CS.Classify
             else  {
                 if (PlayerController.LocalPlayerInstance == null)
                 {
-                    Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
-                    PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                    Debug.LogFormat("We are Instantiating LocalPlayer from " + SceneManagerHelper.ActiveSceneName);
+                    GameObject playerInstance = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                    playerInstance.name = PhotonNetwork.NickName;
+                    SetPlayerNameTag(playerInstance, PhotonNetwork.NickName);
                 }
                 else
                 {
                     Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
                 }
             }
+        }
+
+        private void SetPlayerNameTag(GameObject playerInstance, string playerName)
+        {
+            TextMeshProUGUI nameTag = playerInstance.GetComponentInChildren<TextMeshProUGUI>();
+
+            if (nameTag != null)
+            {
+                nameTag.text = playerName;
+            }
+            else
+            {
+                Debug.LogWarning("TextMeshPro component for player name tag not found in the player prefab.");
+            }
+
+            Debug.Log("Username set to " + playerName);
         }
 
         /// When leave room button is clicked, leave room
@@ -105,11 +124,20 @@ namespace Com.CS.Classify
                 Debug.LogFormat("OnPlayerEnteredRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
             }
 
+            GameObject playerInstance;
+
             if (other.IsLocal)
             {
                 Debug.LogFormat("Instantiating player for {0}", other.NickName);
-                PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                playerInstance = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                playerInstance.name = other.NickName;
             }
+            else
+            {
+                playerInstance = GameObject.Find(other.NickName);
+            }
+
+            SetPlayerNameTag(playerInstance, other.NickName);
         }
 
         // When another player leaves the room, log information
