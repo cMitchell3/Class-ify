@@ -15,6 +15,9 @@ public class PlayerController : MonoBehaviourPun
     private AudioListener audioListener;
     private Camera mainCamera;
     private bool movementEnabled;
+    [Tooltip("The Player's UI GameObject Prefab")]
+    [SerializeField]
+    public GameObject PlayerUiPrefab;
 
     // Initialize local player instance if this is an instance of the local player
     void Awake() {
@@ -40,26 +43,37 @@ public class PlayerController : MonoBehaviourPun
                 cameraFollow.SetTarget(transform);
             }
 
-            Canvas canvas = GetComponentInChildren<Canvas>();
+        //     Canvas canvas = GetComponentInChildren<Canvas>();
 
-            if (canvas != null)
-            {
-                Camera mainCamera = Camera.main;
+        //     if (canvas != null)
+        //     {
+        //         Camera mainCamera = Camera.main;
 
-                if (mainCamera != null)
-                {
-                    canvas.renderMode = RenderMode.WorldSpace;
-                    canvas.worldCamera = mainCamera;
-                }
-                else
-                {
-                    Debug.LogError("Main camera not found. Make sure there is a camera tagged as MainCamera in the scene.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Canvas component not found on the name tag.");
-            }
+        //         if (mainCamera != null)
+        //         {
+        //             canvas.renderMode = RenderMode.WorldSpace;
+        //             canvas.worldCamera = mainCamera;
+        //         }
+        //         else
+        //         {
+        //             Debug.LogError("Main camera not found. Make sure there is a camera tagged as MainCamera in the scene.");
+        //         }
+        //     }
+        //     else
+        //     {
+        //         Debug.LogError("Canvas component not found on the name tag.");
+        //     }
+
+        }
+
+         if (PlayerUiPrefab != null)
+        {
+            GameObject _uiGo = Instantiate(PlayerUiPrefab);
+            _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
+        }
+        else
+        {
+            Debug.LogWarning("<Color=Red><a>Missing</a></Color> PlayerUiPrefab reference on player Prefab.", this);
         }
     }
 
