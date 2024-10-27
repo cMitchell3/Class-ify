@@ -42,28 +42,6 @@ public class PlayerController : MonoBehaviourPun
             {
                 cameraFollow.SetTarget(transform);
             }
-
-        //     Canvas canvas = GetComponentInChildren<Canvas>();
-
-        //     if (canvas != null)
-        //     {
-        //         Camera mainCamera = Camera.main;
-
-        //         if (mainCamera != null)
-        //         {
-        //             canvas.renderMode = RenderMode.WorldSpace;
-        //             canvas.worldCamera = mainCamera;
-        //         }
-        //         else
-        //         {
-        //             Debug.LogError("Main camera not found. Make sure there is a camera tagged as MainCamera in the scene.");
-        //         }
-        //     }
-        //     else
-        //     {
-        //         Debug.LogError("Canvas component not found on the name tag.");
-        //     }
-
         }
 
          if (PlayerUiPrefab != null)

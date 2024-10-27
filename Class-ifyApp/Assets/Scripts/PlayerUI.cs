@@ -16,7 +16,7 @@ namespace Com.MyCompany.MyGame
         #region Private Fields
 
         [Tooltip("Pixel offset from the player target")]
-        private Vector3 screenOffset = new Vector3(0f, 50f, 0f);
+        private Vector3 screenOffset = new Vector3(0f, 50f, -40f);
         private PlayerController target;
         Transform targetTransform;
         CanvasGroup _canvasGroup;
@@ -28,9 +28,16 @@ namespace Com.MyCompany.MyGame
 
         void Awake()
         {
-            this.transform.SetParent(GameObject.Find("Canvas").GetComponent<Transform>(), false);
+            GameObject canvas = GameObject.Find("Canvas");
+            if (canvas != null)
+            {
+                this.transform.SetParent(canvas.transform, false);
+                this.transform.SetAsFirstSibling();
+            }
+            
             _canvasGroup = this.GetComponent<CanvasGroup>();
         }
+
 
         void Update()
         {
