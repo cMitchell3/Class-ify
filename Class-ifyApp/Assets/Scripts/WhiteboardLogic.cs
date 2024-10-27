@@ -10,7 +10,6 @@ public class WhiteboardLogic : MonoBehaviour
 
     public void ActivateWhiteboard()
     {
-        Debug.Log("Activated whiteboard, disabled player controller");
         whiteboardObject.SetActive(!whiteboardObject.activeSelf);
         EnablePlayerMovement(false);
     }
