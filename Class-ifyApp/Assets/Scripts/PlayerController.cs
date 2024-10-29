@@ -6,10 +6,15 @@ using Photon.Realtime;
 
 public class PlayerController : MonoBehaviourPun
 {
+    // Movement and Animation
     public Rigidbody2D rb;
     public float moveSpeed;
     float xInput;
     float yInput;
+    public Animator animator;
+    private Vector2 lastMovement;
+
+    // Photon
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
     private AudioListener audioListener;
@@ -34,6 +39,7 @@ public class PlayerController : MonoBehaviourPun
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
 
         if (photonView.IsMine)
         {
@@ -67,14 +73,64 @@ public class PlayerController : MonoBehaviourPun
             return;
         }
 
+        // Movement
         GetInput();
+        rb.velocity = new Vector2(xInput, yInput) * moveSpeed;
 
-        rb.velocity = new Vector2(xInput, yInput).normalized * moveSpeed;
+        // Animations
+        Animate();
     }
 
     void GetInput()
     {
         xInput = Input.GetAxisRaw("Horizontal");
         yInput = Input.GetAxisRaw("Vertical");
+
+        if (xInput != 0)
+        {
+            yInput = 0;
+        }
+        else if (yInput != 0)
+        {
+            xInput = 0;
+        }
+
+        animator.SetFloat("xInput", xInput);
+        animator.SetFloat("yInput", yInput);
+    }
+
+    void Animate()
+    {
+        if (rb.velocity != Vector2.zero)
+        {
+            lastMovement = rb.velocity;
+        }
+
+        if (rb.velocity == Vector2.zero)
+        {
+            // Player is idle
+            animator.SetBool("IsMoving", false);
+            if (lastMovement.x > 0)
+            {
+                animator.SetInteger("LastDirection", 1);  // Right
+            }
+            else if (lastMovement.x < 0)
+            {
+                animator.SetInteger("LastDirection", 2);  // Left
+            }
+            else if (lastMovement.y > 0)
+            {
+                animator.SetInteger("LastDirection", 3);  // Up
+            }
+            else if (lastMovement.y < 0)
+            {
+                animator.SetInteger("LastDirection", 4);  // Down
+            }
+        }
+        else
+        {
+            // Player is running
+            animator.SetBool("IsMoving", true);
+        }
     }
 }
