@@ -19,6 +19,7 @@ namespace Com.CS.Classify
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
         public Button leaveRoomButton;
+        private RoomNotificationManager roomNotificationManager;
 
         #endregion
 
@@ -41,6 +42,12 @@ namespace Com.CS.Classify
             if (leaveRoomButton != null)
             {
                 leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
+            }
+
+            roomNotificationManager = FindObjectOfType<RoomNotificationManager>();
+            if (roomNotificationManager == null)
+            {
+                Debug.LogError("Error: cannot find room notification manager script.");
             }
         }
 
@@ -78,22 +85,6 @@ namespace Com.CS.Classify
             }
         }
 
-        // private void SetPlayerNameTag(GameObject playerInstance, string playerName)
-        // {
-        //     TextMeshProUGUI nameTag = playerInstance.GetComponentInChildren<TextMeshProUGUI>();
-
-        //     if (nameTag != null)
-        //     {
-        //         nameTag.text = playerName;
-        //     }
-        //     else
-        //     {
-        //         Debug.LogWarning("TextMeshPro component for player name tag not found in the player prefab.");
-        //     }
-
-        //     Debug.Log("Username set to " + playerName);
-        // }
-
         /// When leave room button is clicked, leave room
         private void OnLeaveRoomButtonClicked()
         {
@@ -116,6 +107,7 @@ namespace Com.CS.Classify
         {
             // Not seen if you're player joining
             Debug.LogFormat("OnPlayerEnteredRoom() " + other.NickName);
+            FindObjectOfType<RoomNotificationManager>().ShowPlayerJoined(other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -125,7 +117,7 @@ namespace Com.CS.Classify
             if (other.IsLocal)
             {
                 Debug.LogFormat("Instantiating player for {0}", other.NickName);
-                 GameObject playerInstance = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                GameObject playerInstance = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
             }
         }
 
@@ -133,6 +125,7 @@ namespace Com.CS.Classify
         public override void OnPlayerLeftRoom(Player other)
         {
             Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
+            FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {
