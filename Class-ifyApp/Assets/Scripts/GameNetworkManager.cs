@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
+using TMPro;
 
 namespace Com.CS.Classify
 {
@@ -18,6 +19,7 @@ namespace Com.CS.Classify
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
         public Button leaveRoomButton;
+        private RoomNotificationManager roomNotificationManager;
 
         #endregion
 
@@ -40,6 +42,12 @@ namespace Com.CS.Classify
             if (leaveRoomButton != null)
             {
                 leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
+            }
+
+            roomNotificationManager = FindObjectOfType<RoomNotificationManager>();
+            if (roomNotificationManager == null)
+            {
+                Debug.LogError("Error: cannot find room notification manager script.");
             }
         }
 
@@ -67,8 +75,8 @@ namespace Com.CS.Classify
             else  {
                 if (PlayerController.LocalPlayerInstance == null)
                 {
-                    Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
-                    PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                    Debug.LogFormat("We are Instantiating LocalPlayer from " + SceneManagerHelper.ActiveSceneName);
+                    GameObject playerInstance = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
                 }
                 else
                 {
@@ -98,7 +106,8 @@ namespace Com.CS.Classify
         public override void OnPlayerEnteredRoom(Player other)
         {
             // Not seen if you're player joining
-            Debug.LogFormat("OnPlayerEnteredRoom() {0}", other.NickName);
+            Debug.LogFormat("OnPlayerEnteredRoom() " + other.NickName);
+            FindObjectOfType<RoomNotificationManager>().ShowPlayerJoined(other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -108,7 +117,7 @@ namespace Com.CS.Classify
             if (other.IsLocal)
             {
                 Debug.LogFormat("Instantiating player for {0}", other.NickName);
-                PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+                GameObject playerInstance = PhotonNetwork.Instantiate(this.playerPrefab.name, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
             }
         }
 
@@ -116,6 +125,7 @@ namespace Com.CS.Classify
         public override void OnPlayerLeftRoom(Player other)
         {
             Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
+            FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(other.NickName);
 
             if (PhotonNetwork.IsMasterClient)
             {

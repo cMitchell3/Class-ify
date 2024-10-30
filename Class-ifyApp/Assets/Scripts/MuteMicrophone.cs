@@ -1,6 +1,7 @@
 using Photon.Voice.Unity;
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MuteMicrophone : MonoBehaviour
@@ -13,11 +14,17 @@ public class MuteMicrophone : MonoBehaviour
     // Microphone
     public Recorder recorder;
     public TMP_Text errorMessage;
+    private GameObject noMicText;
     
 
     void Start()
     {
-
+        if (SceneManager.GetActiveScene().name == "RoomScene")
+        {
+            noMicText = GameObject.FindGameObjectWithTag("NoMicText");
+            errorMessage = noMicText.GetComponent<TMP_Text>();
+            Debug.Log("We are good!");
+        }
     }
 
     void Update()
@@ -36,16 +43,26 @@ public class MuteMicrophone : MonoBehaviour
 
     public void CheckMicrophone()
     {
-        if (Microphone.devices.Length == 0)
+        if (SceneManager.GetActiveScene().name == "RoomScene")
         {
-            errorMessage.text = "Error - no microphone connected!";
-            errorMessage.color = Color.red;
-            errorMessage.gameObject.SetActive(true);
-        }
-        else
-        {
-            errorMessage.text = "";
-            errorMessage.gameObject.SetActive(false);
+            if (errorMessage == null)
+            {
+                noMicText = GameObject.FindGameObjectWithTag("NoMicText");
+                errorMessage = noMicText.GetComponent<TMP_Text>();
+                Debug.LogWarning("Error message Text UI is not assigned.");
+                return;
+            }
+            if (Microphone.devices.Length == 0)
+            {
+                errorMessage.text = "Error - no microphone connected!";
+                errorMessage.color = Color.red;
+                errorMessage.gameObject.SetActive(true);
+            }
+            else
+            {
+                errorMessage.text = "";
+                errorMessage.gameObject.SetActive(false);
+            }
         }
     }
 }

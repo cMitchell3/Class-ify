@@ -251,6 +251,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 0}
   moveSpeed: 4
+  PlayerUiPrefab: {fileID: 8478812165029817923, guid: f59d3b072a0ef6d418f0061ad0eeb4bd, type: 3}
 --- !u!50 &7667736149979901135
 Rigidbody2D:
   serializedVersion: 4

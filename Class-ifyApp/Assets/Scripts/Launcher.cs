@@ -35,6 +35,7 @@ namespace Com.CS.Classify
         private FirebaseFirestore db;
         private FirebaseAuth auth;
         private FirebaseUser user;
+        private string username;
         string gameVersion = "1";
         string roomCodeText;
         // private SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
@@ -84,11 +85,21 @@ namespace Com.CS.Classify
         }
 
         // Called when script is loaded, logs errors
-        void Start()
+        async void Start()
         {
             if (codeGenerationLogic == null)
             {
                 Debug.LogError("Error: codeGenerationLogic is not assigned in the Inspector.");
+            }
+
+            DocumentSnapshot snapshot = await GetUserDataAsync();
+            if (snapshot != null)
+            {
+                this.username = snapshot.TryGetValue("username", out string usernameOut) ? usernameOut : "";
+            }
+            else
+            {
+                this.username = user.Email.Split('@')[0];
             }
         }
 
@@ -234,6 +245,31 @@ namespace Com.CS.Classify
             }
         }
 
+        private async Task<DocumentSnapshot> GetUserDataAsync()
+        {
+            DocumentReference docRef = db.Collection("user").Document(user.Email);
+            
+            try
+            {
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                
+                if (snapshot.Exists)
+                {
+                    return snapshot;
+                }
+                else
+                {
+                    Debug.LogWarning("User ocument does not exist, using email prefix.");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error: Failed to check for user document: " + ex.Message);
+                return null;
+            }
+        }
+
 
         // Failed to create room due to room code already existing
         private void FailCreateRoom(bool randomCodeFlag)
@@ -255,6 +291,7 @@ namespace Com.CS.Classify
         {
             DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
             Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
+            PhotonNetwork.NickName = username;
             PhotonNetwork.LoadLevel("RoomScene");
         }
 
