@@ -22,7 +22,7 @@ namespace Com.CS.Classify
         Transform targetTransform;
         CanvasGroup _canvasGroup;
         Vector3 targetPosition;
-        private isHost;
+        private bool isHost;
 
         #endregion
 
