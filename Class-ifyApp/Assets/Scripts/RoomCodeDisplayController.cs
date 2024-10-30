@@ -7,7 +7,6 @@ using TMPro;
 public class RoomCodeDisplayController : MonoBehaviour
 {
     public TextMeshProUGUI tmpText;
-
     private string joinCode = "";
 
     // On startup get room code and initialize text

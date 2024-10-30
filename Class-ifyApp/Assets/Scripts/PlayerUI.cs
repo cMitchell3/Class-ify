@@ -1,7 +1,7 @@
 using UnityEngine;
 using TMPro;
 
-namespace Com.MyCompany.MyGame
+namespace Com.CS.Classify
 {
     public class PlayerUI : MonoBehaviour
     {
@@ -10,6 +10,7 @@ namespace Com.MyCompany.MyGame
         [Tooltip("UI Text to display Player's Name")]
         [SerializeField]
         public TextMeshProUGUI playerNameText;
+        public GameObject hostStar;
 
         #endregion
 
@@ -21,6 +22,7 @@ namespace Com.MyCompany.MyGame
         Transform targetTransform;
         CanvasGroup _canvasGroup;
         Vector3 targetPosition;
+        private isHost;
 
         #endregion
 
@@ -34,10 +36,9 @@ namespace Com.MyCompany.MyGame
                 this.transform.SetParent(canvas.transform, false);
                 this.transform.SetAsFirstSibling();
             }
-            
+
             _canvasGroup = this.GetComponent<CanvasGroup>();
         }
-
 
         void Update()
         {
@@ -58,10 +59,23 @@ namespace Com.MyCompany.MyGame
             }
         }
 
-
         #endregion
 
         #region Public Methods
+
+        public void SetHostStatus(bool isHost)
+        {   
+            // this.isHost = isHost;
+            if (isHost)
+            {
+                hostStar.SetActive(true);
+            }
+            else
+            {
+                hostStar.SetActive(false);
+            }
+        }
+
 
         public void SetTarget(PlayerController _target)
         {

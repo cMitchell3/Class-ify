@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,18 +10,29 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
+using Firebase.Firestore;
+
 using TMPro;
 
 namespace Com.CS.Classify
 {
-    public class GameManager : MonoBehaviourPunCallbacks
+    public class GameNetworkManager : MonoBehaviourPunCallbacks
     {
         #region Public Fields
 
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
         public Button leaveRoomButton;
+        public string roomCode;
+        public string host;
+
+        #endregion
+
+        #region private Fields
+
         private RoomNotificationManager roomNotificationManager;
+        private RoomCodeDisplayController roomCodeDisplayController;
+        private FirebaseFirestore db;
 
         #endregion
 
@@ -49,10 +62,27 @@ namespace Com.CS.Classify
             {
                 Debug.LogError("Error: cannot find room notification manager script.");
             }
+
+            if (DataHolderMainMenu.Instance != null)
+            {
+                this.roomCode = DataHolderMainMenu.Instance.savedCode;
+            }
         }
 
         // Called when script is loaded, instantiates player
-        public void Start() {
+        void Start()
+        {
+            db = FirebaseFirestore.DefaultInstance;
+            
+            if (db == null) 
+            {
+                Debug.LogError("Error: Failed to connect to Firestore.");
+            }
+            else
+            {
+                Debug.Log("Connected to Firestore");
+            }
+
             InstantiatePlayer();
         }
 
@@ -82,6 +112,37 @@ namespace Com.CS.Classify
                 {
                     Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
                 }
+            }
+        }
+
+        //TODO update in DB at some point
+        private void setRoomHost(string hostEmail)
+        {
+            this.host = hostEmail;
+        }
+
+        public async Task<DocumentSnapshot> GetRoomDataAsync()
+        {
+            DocumentReference docRef = db.Collection("room").Document(roomCode);
+            
+            try
+            {
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                
+                if (snapshot.Exists)
+                {
+                    return snapshot;
+                }
+                else
+                {
+                    Debug.LogError("Document does not exist.");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error: Failed to check for room document: " + ex.Message);
+                return null;
             }
         }
 
