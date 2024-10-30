@@ -90,8 +90,8 @@ namespace Com.CS.Classify
             if (PlayerUiPrefab != null)
             {
                 GameObject _uiGo = Instantiate(PlayerUiPrefab);
-                _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
                 _uiGo.SendMessage("SetHostStatus", isHost, SendMessageOptions.RequireReceiver);
+                _uiGo.SendMessage("SetTarget", this, SendMessageOptions.RequireReceiver);
                 if (photonView.IsMine)
                 {
                     _uiGo.SetActive(false);

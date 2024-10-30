@@ -65,15 +65,15 @@ namespace Com.CS.Classify
 
         public void SetHostStatus(bool isHost)
         {   
-            // this.isHost = isHost;
-            if (isHost)
-            {
-                hostStar.SetActive(true);
-            }
-            else
-            {
-                hostStar.SetActive(false);
-            }
+            this.isHost = isHost;
+            // if (isHost)
+            // {
+            //     hostStar.SetActive(true);
+            // }
+            // else
+            // {
+            //     hostStar.SetActive(false);
+            // }
         }
 
 
@@ -91,6 +91,15 @@ namespace Com.CS.Classify
             if (playerNameText != null)
             {
                 playerNameText.text = this.target.photonView.Owner.NickName;
+            }
+
+            if (isHost)
+            {
+                hostStar.SetActive(true);
+            }
+            else
+            {
+                hostStar.SetActive(false);
             }
         }
 
