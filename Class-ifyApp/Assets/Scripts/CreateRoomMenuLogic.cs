@@ -43,13 +43,6 @@ namespace Com.CS.Classify
                 createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
             }
 
-            // launcher = GetComponent<Launcher>();
-
-            // if (launcher == null)
-            // {
-            //     Debug.LogError("Launcher game object cannot be found.");
-            // }
-
             db = FirebaseFirestore.DefaultInstance;
             
             if (db == null) 
@@ -207,13 +200,6 @@ namespace Com.CS.Classify
 
             Debug.Log("Created room with host " + user.Email);
         }
-
-
-        // Called on create room failed
-        // public override void OnCreateRoomFailed(short returnCode, string message)
-        // {
-        //     FailCreateRoom(false);
-        // }
 
         private async Task<bool> DoesRoomExistAsync()
         {
