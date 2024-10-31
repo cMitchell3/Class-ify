@@ -27,7 +27,7 @@ public class ShopLogic : MonoBehaviour
             // Prepare updates for both currency and inventory
             Dictionary<string, object> updates = new Dictionary<string, object>
             {
-                { "currency", currencyDisplay.getCurrencyAmount() },
+                { "coins", currencyDisplay.getCurrencyAmount() },
                 { "inventory", buyItem.getInventoryContent() }
             };
 
