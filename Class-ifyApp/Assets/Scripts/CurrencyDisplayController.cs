@@ -93,4 +93,9 @@ public class CurrencyDisplayController : MonoBehaviour
         await docRef.UpdateAsync(updates);
         Debug.Log($"Currency updated in Firestore: {currencyAmount} coins");
     }
+
+    public int getCurrencyAmount() {
+        return currencyAmount;
+    }
+
 }

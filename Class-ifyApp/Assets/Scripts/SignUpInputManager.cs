@@ -141,7 +141,8 @@ public class SignUpInputManager : MonoBehaviour
         // Define initial data with coins set to 0
         Dictionary<string, object> userData = new Dictionary<string, object>
         {
-            { "coins", 0 }
+            { "coins", 0 },
+            { "inventory", ""},
         };
 
         // Attempt to set user data in Firestore

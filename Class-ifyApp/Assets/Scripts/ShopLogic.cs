@@ -2,25 +2,40 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Firebase.Firestore;
+using Firebase.Auth;
 
 public class ShopLogic : MonoBehaviour
 {
     private CurrencyDisplayController currencyDisplay;
+    private BuyItemLogic buyItem;
 
     private void Start()
     {
-        // Find and assign the CurrencyDisplayController in the scene
+        // Find and assign the CurrencyDisplayController and BuyItemLogic in the scene
         currencyDisplay = FindObjectOfType<CurrencyDisplayController>();
+        buyItem = FindObjectOfType<BuyItemLogic>();
     }
 
-    public void BackButton()
+    public async void BackButton()
     {
-        // Write back the currency amount to Firestore before navigating
-        if (currencyDisplay != null)
+        // Check if both controllers are available
+        if (currencyDisplay != null && buyItem != null)
         {
-            currencyDisplay.UpdateCurrencyInDatabase();
+            var userDocument = FirebaseFirestore.DefaultInstance.Collection("user").Document(FirebaseAuth.DefaultInstance.CurrentUser.Email);
+            
+            // Prepare updates for both currency and inventory
+            Dictionary<string, object> updates = new Dictionary<string, object>
+            {
+                { "currency", currencyDisplay.getCurrencyAmount() },
+                { "inventory", buyItem.getInventoryContent() }
+            };
+
+            // Update both fields at once to Firestore
+            await userDocument.UpdateAsync(updates);
+            Debug.Log("Currency and inventory updated in Firestore");
         }
-        
+
         // Load the main menu scene
         SceneManager.LoadScene("MainMenuScene");
     }
