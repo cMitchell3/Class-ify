@@ -199,6 +199,7 @@ namespace Com.CS.Classify
             {
                 { "Host", user.Email },
                 { "MaxPlayers", maxPlayers },
+                { "ActiveUsers", new string[0] },
             };
             docRef.SetAsync(room).ContinueWithOnMainThread(task => {
                 Debug.Log("Initialized room data in Firestore");
