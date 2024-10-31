@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 
 public class PlayerController : MonoBehaviourPun
 {
@@ -12,7 +13,9 @@ public class PlayerController : MonoBehaviourPun
     float xInput;
     float yInput;
     public Animator animator;
+    private Vector2 movement;
     private Vector2 lastMovement;
+    private Vector2 blockedDirection;
 
     // Photon
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
@@ -75,10 +78,21 @@ public class PlayerController : MonoBehaviourPun
 
         // Movement
         GetInput();
-        rb.velocity = new Vector2(xInput, yInput) * moveSpeed;
 
         // Animations
         Animate();
+    }
+
+    void FixedUpdate()
+    {
+        Vector2 adjustedMovement = movement;
+
+        if (Vector2.Dot(movement, blockedDirection) < 0)
+        {
+            adjustedMovement -= Vector2.Dot(movement, blockedDirection) * blockedDirection;
+        }
+
+        rb.velocity = adjustedMovement * moveSpeed;
     }
 
     void GetInput()
@@ -97,19 +111,22 @@ public class PlayerController : MonoBehaviourPun
 
         animator.SetFloat("xInput", xInput);
         animator.SetFloat("yInput", yInput);
+
+        movement = new Vector2(xInput, yInput);
     }
 
     void Animate()
     {
-        if (rb.velocity != Vector2.zero)
+        if (movement != Vector2.zero)
         {
-            lastMovement = rb.velocity;
+            lastMovement = movement;
         }
 
-        if (rb.velocity == Vector2.zero)
+        if (movement == Vector2.zero)
         {
             // Player is idle
             animator.SetBool("IsMoving", false);
+
             if (lastMovement.x > 0)
             {
                 animator.SetInteger("LastDirection", 1);  // Right
@@ -131,6 +148,22 @@ public class PlayerController : MonoBehaviourPun
         {
             // Player is running
             animator.SetBool("IsMoving", true);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Wall"))
+        {
+            blockedDirection = collision.contacts[0].normal;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Wall"))
+        {
+            blockedDirection = Vector2.zero;
         }
     }
 }
