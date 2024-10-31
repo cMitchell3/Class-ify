@@ -13,6 +13,8 @@ public class WhiteboardDrawing : MonoBehaviour
     private RectTransform rectTransform;
     private Vector2 lastDrawPosition;
     private Image imageComponent;
+    public GameObject colorPanel;
+    public GameObject clearPanel;
 
     void Start()
     {
@@ -109,6 +111,7 @@ public class WhiteboardDrawing : MonoBehaviour
         }
         drawTexture.SetPixels(clearColors);
         drawTexture.Apply();
+        clearPanel.SetActive(!clearPanel.activeSelf);
     }
 
     private void SetDrawColor(Color newColor)
@@ -151,5 +154,43 @@ public class WhiteboardDrawing : MonoBehaviour
             SetDrawColor(previousColor); // Restore the previous drawing color
             isEraserMode = false; // Switch back to pencil mode
         }
+    }
+
+    public void ActivateColorPanel()
+    {
+        colorPanel.SetActive(!colorPanel.activeSelf);
+    }
+
+    public void ActivateClearPanel()
+    {
+        clearPanel.SetActive(!clearPanel.activeSelf);
+    }
+
+    public void OnRedButtonClick()
+    {
+        SetDrawColor(Color.red);
+    }
+
+    public void OnBlackButtonClick()
+    {
+        SetDrawColor(Color.black);
+    }
+
+    public void OnGreenButtonClick()
+    {
+        Color green = new Color(0, 0.75f, 0, 1);
+        SetDrawColor(green);
+    }
+
+    public void OnBlueButtonClick()
+    {
+        Color blue = new Color(0, 0, 0.95f, 1);
+        SetDrawColor(blue);
+    }
+
+    public void OnPurpleButtonClick()
+    {
+        Color purple = new Color(0.7f, 0, 0.7f, 1);
+        SetDrawColor(purple);  
     }
 }
