@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Firebase.Firestore;
+using Firebase.Auth;
+using System.Threading.Tasks;
 
 public class CurrencyDisplayController : MonoBehaviour
 {
@@ -9,14 +12,51 @@ public class CurrencyDisplayController : MonoBehaviour
 
     private int currencyAmount = 0;
 
-    // On startup initialize text
-    public void Start() {
+    // Firebase variables
+    private FirebaseFirestore db;
+    private FirebaseAuth auth;
+    private FirebaseUser user;
+
+    private void Start()
+    {
+        // Initialize Firebase
+        db = FirebaseFirestore.DefaultInstance;
+        auth = FirebaseAuth.DefaultInstance;
+        user = auth.CurrentUser;
+
+        // Check if TextMeshPro component is assigned
         if (tmpText == null)
         {
             tmpText = GetComponent<TextMeshProUGUI>();
         }
 
-        UpdateText();
+        // Load currency amount from Firestore and display it
+        LoadCurrencyFromDatabase();
+    }
+
+    // Load currency amount from Firestore
+    private async void LoadCurrencyFromDatabase()
+    {
+        if (user == null)
+        {
+            Debug.LogWarning("No authenticated user found.");
+            return;
+        }
+
+        DocumentReference docRef = db.Collection("user").Document(user.Email);
+        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+        if (snapshot.Exists && snapshot.ContainsField("coins"))
+        {
+            // Retrieve and update currency amount
+            currencyAmount = snapshot.GetValue<int>("coins");
+            UpdateText();
+            Debug.Log($"Currency loaded: {currencyAmount} coins");
+        }
+        else
+        {
+            Debug.LogWarning("No coins field found for user.");
+        }
     }
 
     // Add/Subtract a certain amount to currency
@@ -24,11 +64,33 @@ public class CurrencyDisplayController : MonoBehaviour
     {
         currencyAmount += amount;
         UpdateText();
+
+        // Optionally, update Firestore with the new currency amount if needed
+        UpdateCurrencyInDatabase();
     }
 
-    // Updates the currency UI number
+    // Update the currency UI number
     private void UpdateText()
     {
         tmpText.text = "Coins: " + currencyAmount.ToString();
+    }
+
+    // Update currency amount in Firestore
+    public async void UpdateCurrencyInDatabase()
+    {
+        if (user == null)
+        {
+            Debug.LogWarning("No authenticated user found.");
+            return;
+        }
+
+        DocumentReference docRef = db.Collection("user").Document(user.Email);
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "coins", currencyAmount }
+        };
+
+        await docRef.UpdateAsync(updates);
+        Debug.Log($"Currency updated in Firestore: {currencyAmount} coins");
     }
 }

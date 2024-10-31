@@ -5,20 +5,23 @@ using UnityEngine.SceneManagement;
 
 public class ShopLogic : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    private CurrencyDisplayController currencyDisplay;
 
-    // Update is called once per frame
-    void Update()
+    private void Start()
     {
-        
+        // Find and assign the CurrencyDisplayController in the scene
+        currencyDisplay = FindObjectOfType<CurrencyDisplayController>();
     }
 
     public void BackButton()
     {
+        // Write back the currency amount to Firestore before navigating
+        if (currencyDisplay != null)
+        {
+            currencyDisplay.UpdateCurrencyInDatabase();
+        }
+        
+        // Load the main menu scene
         SceneManager.LoadScene("MainMenuScene");
     }
 }

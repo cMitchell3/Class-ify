@@ -9,11 +9,21 @@ public class CoinSubtraction : MonoBehaviour
     public Button optionTwo;
     public Button optionThree;
 
+    private CurrencyDisplayController currencyDisplay;
+
+    private void Start()
+    {
+        // Find and assign the CurrencyDisplayController in the scene
+        currencyDisplay = FindObjectOfType<CurrencyDisplayController>();
+    }
+
     public void SubtractCoins(TextMeshProUGUI buttonText)
     {
         // Extract numbers from the button text and textTwo
         int coinsOne = ExtractNumberFromTextOne(buttonText.text);
         int coinsTwo = ExtractNumberFromTextTwo(textTwo.text);
+
+        currencyDisplay.AddNumber(-1 * coinsOne);
 
         // Subtract coinsOne from coinsTwo
         int newCoinsTwo = coinsTwo - coinsOne;
