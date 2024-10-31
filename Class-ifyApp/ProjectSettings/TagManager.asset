@@ -6,6 +6,7 @@ TagManager:
   tags:
   - CreateAccountButton
   - NoMicText
+  - VoiceManager
   layers:
   - Default
   - TransparentFX
