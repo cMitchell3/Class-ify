@@ -5037,7 +5037,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1209105536}
-  - {fileID: 1248405398}
   - {fileID: 561071753}
   - {fileID: 1397282120}
   - {fileID: 1473664957}
@@ -5599,7 +5598,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 1248405398}
+  m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -9556,7 +9555,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac05407101a4b024cbd28f6a21e7550f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tmpText: {fileID: 1058122100}
+  roomCodeDisplay: {fileID: 0}
 --- !u!1 &1159002482
 GameObject:
   m_ObjectHideFlags: 0
@@ -15627,6 +15626,8 @@ MonoBehaviour:
   previousColor: {r: 0, g: 0, b: 0, a: 0}
   brushSize: 4
   brushSoftness: 0.5
+  colorPanel: {fileID: 693548604}
+  clearPanel: {fileID: 316277423}
 --- !u!1 &2115552583
 GameObject:
   m_ObjectHideFlags: 0
@@ -17273,3 +17274,4 @@ SceneRoots:
   - {fileID: 464780196}
   - {fileID: 1778426631}
   - {fileID: 560180215}
+  - {fileID: 292423410}
