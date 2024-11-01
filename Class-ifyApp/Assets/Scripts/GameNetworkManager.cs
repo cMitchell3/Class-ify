@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,6 +9,10 @@ using UnityEngine.UI;
 
 using Photon.Pun;
 using Photon.Realtime;
+
+using Firebase.Auth;
+using Firebase.Firestore;
+using Firebase.Extensions;
 
 using TMPro;
 
@@ -19,7 +25,9 @@ namespace Com.CS.Classify
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
         public Button leaveRoomButton;
+        public TextMeshProUGUI roomCodeDisplay;
         private RoomNotificationManager roomNotificationManager;
+        private FirebaseFirestore db;
 
         #endregion
 
@@ -49,11 +57,22 @@ namespace Com.CS.Classify
             {
                 Debug.LogError("Error: cannot find room notification manager script.");
             }
+
+            db = FirebaseFirestore.DefaultInstance;
+            
+            if (db == null) 
+            {
+                Debug.LogError("Error: Failed to connect to Firestore.");
+            }
+            else
+            {
+                Debug.Log("Connected to Firestore");
+            }
         }
 
         // Called when script is loaded, instantiates player
         public void Start() {
-            InstantiatePlayer();
+            InstantiatePlayer();          
         }
 
         #endregion
@@ -83,6 +102,38 @@ namespace Com.CS.Classify
                     Debug.LogFormat("Ignoring scene load for {0}", SceneManagerHelper.ActiveSceneName);
                 }
             }
+        }
+
+        private async Task<DocumentSnapshot> GetRoomDataAsync()
+        {
+            string roomCode = roomCodeDisplay.text.Split(" ")[2];
+            DocumentReference docRef = db.Collection("room").Document(roomCode);
+            
+            try
+            {
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                
+                if (snapshot.Exists)
+                {
+                    return snapshot;
+                }
+                else
+                {
+                    Debug.LogError("Document does not exist.");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error: Failed to check for room document: " + ex.Message);
+                return null;
+            }
+        }
+
+        private async Task<string[]> GetActiveUsers()
+        {
+            DocumentSnapshot snapshot = await GetRoomDataAsync();
+            return snapshot.TryGetValue("ActiveUsers", out string[] activeUsers) ? activeUsers : new string[0];
         }
 
         /// When leave room button is clicked, leave room

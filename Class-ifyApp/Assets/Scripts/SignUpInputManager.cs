@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using Firebase;
 using Firebase.Firestore;
 using Firebase.Auth;
+using Firebase.Firestore;
+using Firebase.Extensions;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
 
@@ -16,7 +18,7 @@ public class SignUpInputManager : MonoBehaviour
     public DependencyStatus dependencyStatus;
     public FirebaseAuth auth;
     public FirebaseUser User;
-    public FirebaseFirestore db;
+    private FirebaseFirestore db;
 
     [Header("Register")]
     public TMP_InputField usernameInputField;
@@ -102,6 +104,16 @@ public class SignUpInputManager : MonoBehaviour
                 {
                     //Create a user profile and set the username
                     UserProfile profile = new UserProfile { DisplayName = _username };
+
+                    //Store the username in the database
+                    DocumentReference docRef = db.Collection("user").Document(_email);
+                    Dictionary<string, object> userUsername = new Dictionary<string, object>
+                    {
+                        { "username", _username },
+                    };
+                    docRef.SetAsync(userUsername).ContinueWithOnMainThread(task => {
+                        Debug.Log("Initialized username in Firestore");
+                    });
 
                     //Call Firebase auth update user profile function passing the profile with the username
                     var ProfileTask = User.UpdateUserProfileAsync(profile);
