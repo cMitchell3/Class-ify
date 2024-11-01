@@ -96,6 +96,8 @@ namespace Com.CS.Classify
             {
                 this.username = user.Email.Split('@')[0];
             }
+
+            PhotonNetwork.NickName = username;
         }
 
         #endregion
@@ -225,7 +227,6 @@ namespace Com.CS.Classify
         {
             DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
             Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
-            PhotonNetwork.NickName = username;
             PhotonNetwork.LoadLevel("RoomScene");
         }
 
