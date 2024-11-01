@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using System.Threading;
+using System.Threading.Tasks;
 
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,18 +10,27 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 
+using Firebase.Auth;
+using Firebase.Firestore;
+using Firebase.Extensions;
+
 using TMPro;
 
 namespace Com.CS.Classify
 {
-    public class GameManager : MonoBehaviourPunCallbacks
+    public class GameNetworkManager : MonoBehaviourPunCallbacks
     {
         #region Public Fields
 
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
+        public KickPlayerHandler kickPlayerHandler;
         public Button leaveRoomButton;
+        public Button testKickButton;
+        public TMP_InputField testKickPlayerName;
+        public TextMeshProUGUI roomCodeDisplay;
         private RoomNotificationManager roomNotificationManager;
+        private FirebaseFirestore db;
 
         #endregion
 
@@ -44,16 +55,34 @@ namespace Com.CS.Classify
                 leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
             }
 
+            if (testKickButton != null)
+            {
+                testKickButton.onClick.AddListener(OnTestKickButtonClicked);
+            }
+
             roomNotificationManager = FindObjectOfType<RoomNotificationManager>();
             if (roomNotificationManager == null)
             {
                 Debug.LogError("Error: cannot find room notification manager script.");
             }
+
+            db = FirebaseFirestore.DefaultInstance;
+            
+            if (db == null) 
+            {
+                Debug.LogError("Error: Failed to connect to Firestore.");
+            }
+            else
+            {
+                Debug.Log("Connected to Firestore");
+            }
+
+            PhotonNetwork.EnableCloseConnection = true;
         }
 
         // Called when script is loaded, instantiates player
         public void Start() {
-            InstantiatePlayer();
+            InstantiatePlayer();          
         }
 
         #endregion
@@ -85,10 +114,68 @@ namespace Com.CS.Classify
             }
         }
 
+        private async Task<DocumentSnapshot> GetRoomDataAsync()
+        {
+            string roomCode = roomCodeDisplay.text.Split(" ")[2];
+            DocumentReference docRef = db.Collection("room").Document(roomCode);
+            
+            try
+            {
+                DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+                
+                if (snapshot.Exists)
+                {
+                    return snapshot;
+                }
+                else
+                {
+                    Debug.LogError("Document does not exist.");
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error: Failed to check for room document: " + ex.Message);
+                return null;
+            }
+        }
+
+        private async Task<string[]> GetActiveUsers()
+        {
+            DocumentSnapshot snapshot = await GetRoomDataAsync();
+            return snapshot.TryGetValue("ActiveUsers", out string[] activeUsers) ? activeUsers : new string[0];
+        }
+
         /// When leave room button is clicked, leave room
         private void OnLeaveRoomButtonClicked()
         {
             LeaveRoom();
+        }
+
+        private void OnTestKickButtonClicked()
+        {
+            kickPlayerHandler.RequestKickPlayer(testKickPlayerName.text);
+        }
+
+        public Player GetPlayerByUsername(string playerName)
+        {
+            Debug.Log("Finding player with username" + playerName);
+            Player targetPlayer = null;
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                if (player.NickName == playerName)
+                {
+                    targetPlayer = player;
+                    break;
+                }
+            }
+
+            if (targetPlayer == null)
+            {
+                Debug.LogError($"Player with nickname {playerName} not found.");
+            }
+            
+            return targetPlayer;
         }
 
         #endregion

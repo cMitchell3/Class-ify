@@ -3,13 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
 
 public class PlayerController : MonoBehaviourPun
 {
+    // Movement and Animation
     public Rigidbody2D rb;
     public float moveSpeed;
     float xInput;
     float yInput;
+    public Animator animator;
+    private Vector2 movement;
+    private Vector2 lastMovement;
+    private Vector2 blockedDirection;
+
+    // Photon
     [Tooltip("The local player instance. Use this to know if the local player is represented in the Scene")]
     public static GameObject LocalPlayerInstance;
     private AudioListener audioListener;
@@ -34,6 +42,7 @@ public class PlayerController : MonoBehaviourPun
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator = GetComponent<Animator>();
 
         if (photonView.IsMine)
         {
@@ -71,14 +80,94 @@ public class PlayerController : MonoBehaviourPun
             return;
         }
 
+        // Movement
         GetInput();
 
-        rb.velocity = new Vector2(xInput, yInput).normalized * moveSpeed;
+        // Animations
+        Animate();
+    }
+
+    void FixedUpdate()
+    {
+        Vector2 adjustedMovement = movement;
+
+        if (Vector2.Dot(movement, blockedDirection) < 0)
+        {
+            adjustedMovement -= Vector2.Dot(movement, blockedDirection) * blockedDirection;
+        }
+
+        rb.velocity = adjustedMovement * moveSpeed;
     }
 
     void GetInput()
     {
         xInput = Input.GetAxisRaw("Horizontal");
         yInput = Input.GetAxisRaw("Vertical");
+
+        if (xInput != 0)
+        {
+            yInput = 0;
+        }
+        else if (yInput != 0)
+        {
+            xInput = 0;
+        }
+
+        animator.SetFloat("xInput", xInput);
+        animator.SetFloat("yInput", yInput);
+
+        movement = new Vector2(xInput, yInput);
+    }
+
+    void Animate()
+    {
+        if (movement != Vector2.zero)
+        {
+            lastMovement = movement;
+        }
+
+        if (movement == Vector2.zero)
+        {
+            // Player is idle
+            animator.SetBool("IsMoving", false);
+
+            if (lastMovement.x > 0)
+            {
+                animator.SetInteger("LastDirection", 1);  // Right
+            }
+            else if (lastMovement.x < 0)
+            {
+                animator.SetInteger("LastDirection", 2);  // Left
+            }
+            else if (lastMovement.y > 0)
+            {
+                animator.SetInteger("LastDirection", 3);  // Up
+            }
+            else if (lastMovement.y < 0)
+            {
+                animator.SetInteger("LastDirection", 4);  // Down
+            }
+        }
+        else
+        {
+            // Player is running
+            animator.SetBool("IsMoving", true);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Wall"))
+        {
+            blockedDirection = collision.contacts[0].normal;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Wall"))
+        {
+            blockedDirection = Vector2.zero;
+        }
     }
 }

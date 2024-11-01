@@ -6,7 +6,7 @@ using TMPro;
 
 public class RoomCodeDisplayController : MonoBehaviour
 {
-    public TextMeshProUGUI tmpText;
+    public TextMeshProUGUI roomCodeDisplay;
 
     private string joinCode = "";
 
@@ -21,9 +21,9 @@ public class RoomCodeDisplayController : MonoBehaviour
             Debug.LogError("DataHolderMainMenu instance is null.");
         }
 
-        if (tmpText == null)
+        if (roomCodeDisplay == null)
         {
-            tmpText = GetComponent<TextMeshProUGUI>();
+            roomCodeDisplay = GetComponent<TextMeshProUGUI>();
         }
 
         UpdateText();
@@ -32,6 +32,6 @@ public class RoomCodeDisplayController : MonoBehaviour
     // Updates the currency UI number
     private void UpdateText()
     {
-        tmpText.text = "Join Code: " + joinCode;
+        roomCodeDisplay.text = "Join Code: " + joinCode;
     }
 }

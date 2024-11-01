@@ -7,6 +7,7 @@ TagManager:
   - CreateAccountButton
   - NoMicText
   - VoiceManager
+  - Wall
   layers:
   - Default
   - TransparentFX

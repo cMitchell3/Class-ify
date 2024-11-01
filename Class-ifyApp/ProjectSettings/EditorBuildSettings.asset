@@ -29,4 +29,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ResetPasswordScene.unity
     guid: bb8a3dff431192d42974bf121f61eda7
+  - enabled: 1
+    path: Assets/Scenes/CreateRoomMenu.unity
+    guid: d8c69f3355d537643b95817cb088a9de
   m_configObjects: {}
