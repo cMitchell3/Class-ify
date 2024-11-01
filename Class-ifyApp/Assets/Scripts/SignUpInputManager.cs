@@ -6,7 +6,6 @@ using UnityEngine.UI;
 using Firebase;
 using Firebase.Firestore;
 using Firebase.Auth;
-using Firebase.Firestore;
 using Firebase.Extensions;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
@@ -110,6 +109,8 @@ public class SignUpInputManager : MonoBehaviour
                     Dictionary<string, object> userUsername = new Dictionary<string, object>
                     {
                         { "username", _username },
+                        { "coins", 0 },
+                        { "inventory", "" },
                     };
                     docRef.SetAsync(userUsername).ContinueWithOnMainThread(task => {
                         Debug.Log("Initialized username in Firestore");
@@ -130,7 +131,7 @@ public class SignUpInputManager : MonoBehaviour
                     }
                     else
                     {
-                        yield return InitializeUserData(_email);
+//                        yield return InitializeUserData(_email);
 
                         //Username is now set, now return to login screen
                         warningRegisterText.text = "";
