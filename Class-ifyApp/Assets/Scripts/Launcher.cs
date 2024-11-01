@@ -28,19 +28,17 @@ namespace Com.CS.Classify
         public TMP_InputField roomCode;
         public TextMeshProUGUI errorMessage;
         public GameObject playerPrefab;
-        // public LinearCongruentialGenerator codeGenerationLogic;
 
         #endregion
 
         #region Private Fields
-        // private static Launcher launcherInstance;
+
         private FirebaseFirestore db;
         private FirebaseAuth auth;
         private FirebaseUser user;
         private string username;
         string gameVersion = "1";
         string roomCodeText;
-        // private SemaphoreSlim semaphore = new SemaphoreSlim(1, 1);
 
         #endregion
 
@@ -49,17 +47,6 @@ namespace Com.CS.Classify
         // Called during early initialization, connects to master server, sets up listeners for join and create room buttons
         void Awake()
         {
-            // if (launcherInstance == null)
-            // {
-            //     launcherInstance = this;
-            //     DontDestroyOnLoad(gameObject);
-            //     SceneManager.sceneLoaded += OnSceneLoaded;
-            // }
-            // else
-            // {
-            //     Destroy(gameObject);
-            // }
-
             db = FirebaseFirestore.DefaultInstance;
             
             if (db == null) 
@@ -100,11 +87,6 @@ namespace Com.CS.Classify
         // Called when script is loaded, logs errors
         async void Start()
         {
-            // if (codeGenerationLogic == null)
-            // {
-            //     Debug.LogError("Error: codeGenerationLogic is not assigned in the Inspector.");
-            // }
-
             DocumentSnapshot snapshot = await GetUserDataAsync();
             if (snapshot != null)
             {
@@ -114,6 +96,8 @@ namespace Com.CS.Classify
             {
                 this.username = user.Email.Split('@')[0];
             }
+
+            PhotonNetwork.NickName = username;
         }
 
         #endregion
@@ -130,14 +114,6 @@ namespace Com.CS.Classify
                 PhotonNetwork.GameVersion = gameVersion;
             }
         }
-
-        // private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        // {
-        //     if (!scene.name.Equals("MainMenuScene") && !scene.name.Equals("CreateRoomMenu"))
-        //     {
-        //         Destroy(gameObject);
-        //     }
-        // }
 
         /// When join room button is clicked, join to room, otherwise throw error
         private void OnJoinRoomButtonClicked()
@@ -158,42 +134,6 @@ namespace Com.CS.Classify
             PhotonNetwork.LoadLevel("CreateRoomMenu");
         }   
 
-        // public async bool CreateRoomMenuButton(string roomCode, int maxPlayers)
-        // {
-            // roomCodeText = roomCode;
-            // bool randomCodeFlag = false;
-            // if (PhotonNetwork.IsConnected)
-            // {   
-            //     if (roomCode == "")
-            //     {
-            //         codeGenerationLogic.RandomizeSeed();
-            //         roomCodeText = codeGenerationLogic.Next().ToString();
-            //         randomCodeFlag = true;
-            //     }
-
-
-            //     bool exists = await DoesRoomExistAsync();
-            //     if (exists)
-            //     {
-            //         FailCreateRoom(randomCodeFlag);
-            //         return false;
-            //     }
-            //     else
-            //     {
-            //         //TODO change to reflect user input when creating room
-            //         InitRoomData(maxPlayers);
-            //         CreateRoom(maxPlayers);
-            //         return true;
-            //     }
-            // }
-            // else
-            // {
-            //     Debug.LogWarning("Not connected to Photon server. Cannot create a room.");
-            // }
-
-            // return false;
-        // }
-
         // Check if a room exists in Firestore
         private async Task<bool> DoesRoomExistAsync()
         {
@@ -210,23 +150,6 @@ namespace Com.CS.Classify
                 return false;
             }
         }
-
-
-        // Initialize or re-initialize room data from Firestore
-        // private void InitRoomData(int maxPlayers)
-        // {
-        //     DocumentReference docRef = db.Collection("room").Document(roomCodeText);
-        //     Dictionary<string, object> room = new Dictionary<string, object>
-        //     {
-        //         { "Host", user.Email },
-        //         { "MaxPlayers", maxPlayers },
-        //     };
-        //     docRef.SetAsync(room).ContinueWithOnMainThread(task => {
-        //         Debug.Log("Initialized room data in Firestore");
-        //     });
-
-        //     Debug.Log("Created room with host " + user.Email);
-        // }
 
         #endregion
 
@@ -299,28 +222,11 @@ namespace Com.CS.Classify
             }
         }
 
-
-        // Failed to create room due to room code already existing
-        // private void FailCreateRoom(bool randomCodeFlag)
-        // {
-        //     if (randomCodeFlag)
-        //     {
-        //         roomCodeText = "";
-        //         OnCreateRoomButtonClicked();
-        //     }
-        //     else
-        //     {
-        //         errorMessage.text = "room code already in use";
-        //         Debug.Log("Unable to create room, room with same code already exists.");
-        //     }
-        // }
-
         // Join a room
         private void JoinRoom()
         {
             DataHolderMainMenu.Instance.UpdateSavedCode(roomCodeText);
             Debug.Log("Successfully joined room " + PhotonNetwork.CurrentRoom.Name);
-            PhotonNetwork.NickName = username;
             PhotonNetwork.LoadLevel("RoomScene");
         }
 
@@ -359,13 +265,7 @@ namespace Com.CS.Classify
         public override void OnCreatedRoom()
         {
         }
-
-        // // Called on create room failed
-        // public override void OnCreateRoomFailed(short returnCode, string message)
-        // {
-        //     FailCreateRoom(false);
-        // }
-
+        
         // Called on connect to master successful
         public override void OnConnectedToMaster()
         {

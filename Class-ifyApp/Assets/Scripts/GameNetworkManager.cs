@@ -18,13 +18,16 @@ using TMPro;
 
 namespace Com.CS.Classify
 {
-    public class GameManager : MonoBehaviourPunCallbacks
+    public class GameNetworkManager : MonoBehaviourPunCallbacks
     {
         #region Public Fields
 
         [Tooltip("The prefab to use for representing the player")]
         public GameObject playerPrefab;
+        public KickPlayerHandler kickPlayerHandler;
         public Button leaveRoomButton;
+        public Button testKickButton;
+        public TMP_InputField testKickPlayerName;
         public TextMeshProUGUI roomCodeDisplay;
         private RoomNotificationManager roomNotificationManager;
         private FirebaseFirestore db;
@@ -52,6 +55,11 @@ namespace Com.CS.Classify
                 leaveRoomButton.onClick.AddListener(OnLeaveRoomButtonClicked);
             }
 
+            if (testKickButton != null)
+            {
+                testKickButton.onClick.AddListener(OnTestKickButtonClicked);
+            }
+
             roomNotificationManager = FindObjectOfType<RoomNotificationManager>();
             if (roomNotificationManager == null)
             {
@@ -68,6 +76,8 @@ namespace Com.CS.Classify
             {
                 Debug.Log("Connected to Firestore");
             }
+
+            PhotonNetwork.EnableCloseConnection = true;
         }
 
         // Called when script is loaded, instantiates player
@@ -140,6 +150,32 @@ namespace Com.CS.Classify
         private void OnLeaveRoomButtonClicked()
         {
             LeaveRoom();
+        }
+
+        private void OnTestKickButtonClicked()
+        {
+            kickPlayerHandler.RequestKickPlayer(testKickPlayerName.text);
+        }
+
+        public Player GetPlayerByUsername(string playerName)
+        {
+            Debug.Log("Finding player with username" + playerName);
+            Player targetPlayer = null;
+            foreach (Player player in PhotonNetwork.PlayerList)
+            {
+                if (player.NickName == playerName)
+                {
+                    targetPlayer = player;
+                    break;
+                }
+            }
+
+            if (targetPlayer == null)
+            {
+                Debug.LogError($"Player with nickname {playerName} not found.");
+            }
+            
+            return targetPlayer;
         }
 
         #endregion
