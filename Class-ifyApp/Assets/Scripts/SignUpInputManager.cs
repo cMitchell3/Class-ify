@@ -4,8 +4,8 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using Firebase;
-using Firebase.Auth;
 using Firebase.Firestore;
+using Firebase.Auth;
 using Firebase.Extensions;
 using JetBrains.Annotations;
 using UnityEngine.SceneManagement;
@@ -109,6 +109,8 @@ public class SignUpInputManager : MonoBehaviour
                     Dictionary<string, object> userUsername = new Dictionary<string, object>
                     {
                         { "username", _username },
+                        { "coins", 0 },
+                        { "inventory", "" },
                     };
                     docRef.SetAsync(userUsername).ContinueWithOnMainThread(task => {
                         Debug.Log("Initialized username in Firestore");
@@ -129,6 +131,8 @@ public class SignUpInputManager : MonoBehaviour
                     }
                     else
                     {
+//                        yield return InitializeUserData(_email);
+
                         //Username is now set, now return to login screen
                         warningRegisterText.text = "";
                         confirmationText.text = "Account Created Successfully. Please Login Now";
@@ -138,6 +142,34 @@ public class SignUpInputManager : MonoBehaviour
 
                 }
             }
+        }
+    }
+
+
+    private IEnumerator InitializeUserData(string userEmail)
+    {
+        // Reference the user document in Firestore
+        DocumentReference userDoc = db.Collection("user").Document(userEmail);
+
+        // Define initial data with coins set to 0
+        Dictionary<string, object> userData = new Dictionary<string, object>
+        {
+            { "coins", 0 },
+            { "inventory", ""},
+        };
+
+        // Attempt to set user data in Firestore
+        var SetTask = userDoc.SetAsync(userData);
+        yield return new WaitUntil(() => SetTask.IsCompleted);
+
+        if (SetTask.Exception != null)
+        {
+            // Log any errors encountered while initializing user data
+            Debug.LogWarning($"Failed to initialize user data with {SetTask.Exception}");
+        }
+        else
+        {
+            Debug.Log("User initialized with 0 coins.");
         }
     }
 }
