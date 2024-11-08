@@ -6,8 +6,7 @@ using UnityEngine.EventSystems;
 public class FileCabinetLogic : MonoBehaviour
 {
     public GameObject fileCabinetObject;
-   public GameObject playerController;
-
+    public GameObject playerController;
 
     public void ActivateFileCabinet()
     {
