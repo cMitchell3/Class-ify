@@ -168,28 +168,33 @@ public class WhiteboardDrawing : MonoBehaviour
 
     public void OnRedButtonClick()
     {
+        isEraserMode = false;
         SetDrawColor(Color.red);
     }
 
     public void OnBlackButtonClick()
     {
+        isEraserMode = false;
         SetDrawColor(Color.black);
     }
 
     public void OnGreenButtonClick()
     {
+        isEraserMode = false;
         Color green = new Color(0, 0.75f, 0, 1);
         SetDrawColor(green);
     }
 
     public void OnBlueButtonClick()
     {
+        isEraserMode = false;
         Color blue = new Color(0, 0, 0.95f, 1);
         SetDrawColor(blue);
     }
 
     public void OnPurpleButtonClick()
     {
+        isEraserMode = false;
         Color purple = new Color(0.7f, 0, 0.7f, 1);
         SetDrawColor(purple);  
     }
