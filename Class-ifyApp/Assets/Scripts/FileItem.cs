@@ -9,6 +9,7 @@ public class FileItem : MonoBehaviour
     public TextMeshProUGUI fileName;
     public Button downloadButton;
     public Button deleteButton;
+    public FileCabinetContent fileCabinetContent;
 
     void Start()
     {
