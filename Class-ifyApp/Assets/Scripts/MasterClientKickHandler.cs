@@ -4,10 +4,12 @@ using Photon.Realtime;
 using UnityEngine;
 
 
+
 namespace Com.CS.Classify
 {
     public class MasterClientKickHandler : MonoBehaviourPunCallbacks, IOnEventCallback
     {
+        
         public void OnEvent(EventData photonEvent)
         {
             Debug.Log($"Received event with code: {photonEvent.Code}");
@@ -38,5 +40,8 @@ namespace Com.CS.Classify
             base.OnDisable();
             PhotonNetwork.RemoveCallbackTarget(this);
         }
+
+
+
     }
 }
