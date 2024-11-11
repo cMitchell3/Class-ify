@@ -311,8 +311,9 @@ namespace Com.CS.Classify
         public override void OnPlayerEnteredRoom(Player other)
         {
             // Not seen if you're player joining
-            Debug.LogFormat("OnPlayerEnteredRoom() " + other.NickName);
-            FindObjectOfType<RoomNotificationManager>().ShowPlayerJoined(other.NickName);
+            string username = other.NickName;
+            Debug.LogFormat("OnPlayerEnteredRoom() " + username);
+            FindObjectOfType<RoomNotificationManager>().ShowPlayerJoined(username);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -329,8 +330,9 @@ namespace Com.CS.Classify
         // When another player leaves the room, log information
         public override void OnPlayerLeftRoom(Player other)
         {
-            Debug.LogFormat("OnPlayerLeftRoom() {0}", other.NickName);
-            FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(other.NickName);
+            string username = other.NickName;
+            Debug.LogFormat("OnPlayerLeftRoom() {0}", username);
+            FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(username);
 
             if (PhotonNetwork.IsMasterClient)
             {
