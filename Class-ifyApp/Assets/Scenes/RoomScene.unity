@@ -22020,6 +22020,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8810466598129128816, guid: 80beda1db891f014db05b98b4d311399, type: 3}
+      propertyPath: kickMenu
+      value: 
+      objectReference: {fileID: 930065929}
+    - target: {fileID: 8810466598129128816, guid: 80beda1db891f014db05b98b4d311399, type: 3}
       propertyPath: testButton
       value: 
       objectReference: {fileID: 1939972054}
@@ -22043,6 +22047,10 @@ PrefabInstance:
       propertyPath: kickPlayerHandler
       value: 
       objectReference: {fileID: 413172955}
+    - target: {fileID: 8810466598129128816, guid: 80beda1db891f014db05b98b4d311399, type: 3}
+      propertyPath: playerListElement
+      value: 
+      objectReference: {fileID: 5733578078508158799, guid: d017078412d1d81499490a98a90291fb, type: 3}
     - target: {fileID: 8810466598129128816, guid: 80beda1db891f014db05b98b4d311399, type: 3}
       propertyPath: testKickPlayerName
       value: 
