@@ -7,9 +7,11 @@ using TMPro;
 public class FileCabinetContent : MonoBehaviour
 {
     public TextMeshProUGUI roomCodeDisplay;
+    public GameObject filePrefab;
     private List<FileItem> files;
     [SerializeField]
     private GridLayoutGroup fileGroup;
+    public List<string> currentFileIds;
 
     void Start()
     {
@@ -17,26 +19,27 @@ public class FileCabinetContent : MonoBehaviour
         {
             Debug.LogError("Firestore or FirestoreManager instance is not initialized.");
         }
-        
-        Debug.Log("Starting file cabinet content");
 
         string roomCode = roomCodeDisplay.text.Split(" ")[2];
         FirestoreManager.Instance.ListenToRoomCollection(roomCode, OnFilesChanged);
-        // FirestoreManager.Instance.ListenToRoom(roomCode);
     }
 
-    private void OnFilesChanged(List<string> addedFileIds, List<string> removedFileIds)
+    private void OnFilesChanged(List<string> currentFileIds)
     {
         //TODO update UI
         Debug.Log("Files have been changed");
-        foreach (var fileId in addedFileIds)
+        this.currentFileIds = currentFileIds;
+
+        foreach (var fileId in currentFileIds)
         {
-            Debug.Log("Added File: " + fileId);
+            Debug.Log("File: " + fileId);
         }
 
-        foreach (var fileId in removedFileIds)
-        {
-            Debug.Log("Removed File with ID: " + fileId);
-        }
+        UpdateFileContent();
+    }
+
+    private void UpdateFileContent()
+    {
+
     }
 }
