@@ -71,57 +71,64 @@ public class FirestoreManager : MonoBehaviour
             }
         });
 
-        // DocumentReference docRef = db.Collection("room").Document(roomCode);
-        // Dictionary<string, object> fileData = new Dictionary<string, object>
-        //     {
-        //         { "FileName", fileName },
-        //         { "UploadUser",  uploadUser },
-        //         { "Content", base64Content },
-        //         { "Extension", extension },
-        //     };
-
-        // docRef.SetAsync(fileData).ContinueWith(task =>
-        // {
-        //     if (task.IsCompleted)
-        //     {
-        //         Debug.Log("File uploaded successfully with ID: " + fileId);
-        //     }
-        //     else
-        //     {
-        //         Debug.LogError("Error uploading file, file is likely too large: " + task.Exception);
-        //     }
-        // });
+        AddFileReferenceToRoom(fileId, roomCode);
     }
 
-    // public void DownloadFileFromFirestore(string fileId, string savePath)
-    // {
-    //     Debug.Log("Download file from firestore");
-    //     DocumentReference docRef = db.Collection("file").Document(fileId);
-    //     docRef.GetSnapshotAsync().ContinueWith(task =>
-    //     {
-    //         if (task.IsCompleted)
-    //         {
-    //             DocumentSnapshot snapshot = task.Result;
+    private void AddFileReferenceToRoom(string fileId, string roomCode)
+    {
+        DocumentReference fileDocRef = db.Collection("file").Document(fileId);
+        DocumentReference roomDocRef = db.Collection("room").Document(roomCode);
 
-    //             if (snapshot.Exists)
-    //             {
-    //                 string base64Content = snapshot.GetValue<string>("Content");
-    //                 byte[] fileBytes = Convert.FromBase64String(base64Content);
-    //                 File.WriteAllBytes(savePath, fileBytes);
+        roomDocRef.UpdateAsync("files", FieldValue.ArrayUnion(fileDocRef)).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("File reference added to room: " + roomCode);
+            }
+            else
+            {
+                Debug.LogError("Error adding file reference to room: " + task.Exception);
+            }
+        });
+    }
 
-    //                 Debug.Log("File downloaded and saved successfully.");
-    //             }
-    //             else
-    //             {
-    //                 Debug.LogError("File document not found.");
-    //             }
-    //         }
-    //         else
-    //         {
-    //             Debug.LogError("Error downloading file: " + task.Exception);
-    //         }
-    //     });
-    // }
+    public void DeleteFileFromFirestore(string fileId, string roomCode)
+    {
+        DocumentReference fileDocRef = db.Collection("file").Document(fileId);
+
+        fileDocRef.DeleteAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("File removed successfully from 'file' collection with ID: " + fileId);
+            }
+            else
+            {
+                Debug.LogError("Error removing file from 'file' collection: " + task.Exception);
+            }
+        });
+
+        RemoveFileReferenceFromRoom(fileId, roomCode);
+    }
+
+    private void RemoveFileReferenceFromRoom(string fileId, string roomCode)
+    {
+        DocumentReference roomDocRef = db.Collection("room").Document(roomCode);
+        DocumentReference fileDocRef = db.Collection("file").Document(fileId);
+
+        roomDocRef.UpdateAsync("files", FieldValue.ArrayRemove(fileDocRef)).ContinueWith(task =>
+        {
+            if (task.IsCompleted)
+            {
+                Debug.Log("File reference removed from room's 'files' array: " + roomCode);
+            }
+            else
+            {
+                Debug.LogError("Error removing file reference from room: " + task.Exception);
+            }
+        });
+    }
+
 
     public void ListenToRoomCollection(string roomId, Action<List<string>> onFilesChanged)
     {

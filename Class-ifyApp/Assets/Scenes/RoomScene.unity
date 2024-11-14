@@ -6532,6 +6532,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   importButton: {fileID: 1958785731}
+  roomCodeDisplay: {fileID: 1058122100}
 --- !u!1 &364384197
 GameObject:
   m_ObjectHideFlags: 0

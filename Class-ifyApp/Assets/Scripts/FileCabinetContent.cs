@@ -13,6 +13,7 @@ public class FileCabinetContent : MonoBehaviour
     private GridLayoutGroup fileGroup;
     private List<string> currentFileIds;
     private Dictionary<string, GameObject> fileItemInstances = new Dictionary<string, GameObject>();
+    private string roomCode;
 
     void Start()
     {
@@ -21,7 +22,7 @@ public class FileCabinetContent : MonoBehaviour
             Debug.LogError("Firestore or FirestoreManager instance is not initialized.");
         }
 
-        string roomCode = roomCodeDisplay.text.Split(" ")[2];
+        roomCode = roomCodeDisplay.text.Split(" ")[2];
         currentFileIds = new List<string>();
         FirestoreManager.Instance.ListenToRoomCollection(roomCode, OnFilesChanged);
     }
@@ -35,6 +36,8 @@ public class FileCabinetContent : MonoBehaviour
             Destroy(fileInstance);
             fileItemInstances.Remove(fileId);
         }
+
+        FirestoreManager.Instance.DeleteFileFromFirestore(fileId, roomCode);
     }
 
     private async void OnFilesChanged(List<string> outputFileIds)
