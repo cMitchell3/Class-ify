@@ -11,7 +11,7 @@ public class RoomCodeDisplayController : MonoBehaviour
     private string joinCode = "";
 
     // On startup get room code and initialize text
-    void Awake() {
+    public void Start() {
         if (DataHolderMainMenu.Instance != null)
         {
             joinCode = DataHolderMainMenu.Instance.savedCode;
