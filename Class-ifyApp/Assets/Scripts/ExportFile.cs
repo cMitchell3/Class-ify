@@ -8,13 +8,17 @@ using System.IO;
 
 public class ExportFile : MonoBehaviour
 {
-    public static void SaveFile(string fileName, byte[] fileBytes, string extension)
+    public static void SaveFile(string fileName, string extension, byte[] content)
     {
         Debug.Log("Opening save file dialog");
         string savePath = SaveFileDialog(fileName, extension);
 
-        File.WriteAllBytes(savePath, fileBytes);
-        Debug.Log("File saved at: " + savePath);
+        if (!savePath.Equals(""))
+        {
+            // FirestoreManager.Instance.DownloadFileFromFirestore(fileId, savePath);
+            File.WriteAllBytes(savePath, content);
+            Debug.Log("File saved at: " + savePath);
+        }
     }
 
     private static string SaveFileDialog(string fileName, string extension)

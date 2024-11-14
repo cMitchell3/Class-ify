@@ -6,9 +6,11 @@ using UnityEngine.UI;
 
 public class FileItem : MonoBehaviour
 {
-    public TextMeshProUGUI fileName;
+    public TextMeshProUGUI fileTextDisplay;
     public Button downloadButton;
     public Button deleteButton;
+    private FileCabinetContent fileCabinetContent;
+    private FileInfo fileInfo;
 
     void Start()
     {
@@ -16,6 +18,9 @@ public class FileItem : MonoBehaviour
         {
             Debug.LogError("Firestore or FirestoreManager instance is not initialized.");
         }
+
+        GameObject parentObject = this.transform.parent.gameObject;
+        fileCabinetContent = parentObject.GetComponent<FileCabinetContent>();
 
         if (downloadButton != null)
         {
@@ -29,14 +34,21 @@ public class FileItem : MonoBehaviour
 
     }
 
+    public void SetFileInfo(FileInfo fileInfo)
+    {
+        this.fileInfo = fileInfo;
+        this.fileTextDisplay.text = $"{fileInfo.GetFileName()}.{fileInfo.GetExtension()}";
+    }
+
     private void OnDownloadButtonClicked()
     {
-        Debug.Log("Download button clicked");
-        FirestoreManager.Instance.DownloadFileFromFirestore("9048b6e0-6427-4aab-9a25-295629e298ce");
+        ExportFile.SaveFile(fileInfo.GetFileName(), fileInfo.GetExtension(), fileInfo.GetContent());
     }
 
     private void OnDeleteButtonClicked()
     {
-        
+        //TODO check if host
+        Debug.Log("Delete clicked");
+        fileCabinetContent.DeleteFile(fileInfo.GetFileId());   
     }
 }

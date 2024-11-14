@@ -12,7 +12,6 @@ public class FirestoreManager : MonoBehaviour
 {
     public static FirestoreManager Instance { get; private set; }
     public FirebaseFirestore db { get; private set; }
-    private HashSet<string> previousFileIds = new HashSet<string>();
 
     void Awake()
     {
@@ -42,13 +41,14 @@ public class FirestoreManager : MonoBehaviour
         }
     }
 
-    public void UploadFileToFirestore(string filePath)
+    //TODO attatch to room
+    public void UploadFileToFirestore(string filePath, string roomCode)
     {
         string fileId = Guid.NewGuid().ToString();
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         string uploadUser = FirebaseAuthManager.Instance.GetUserEmail();
         string base64Content = FileConverter.ConvertFileToBase64(filePath);
-        string extension = Path.GetExtension(filePath);
+        string extension = Path.GetExtension(filePath).TrimStart('.');
 
         DocumentReference docRef = db.Collection("file").Document(fileId);
         Dictionary<string, object> fileData = new Dictionary<string, object>
@@ -56,7 +56,7 @@ public class FirestoreManager : MonoBehaviour
                 { "FileName", fileName },
                 { "UploadUser",  uploadUser },
                 { "Content", base64Content },
-                { "Type", extension },
+                { "Extension", extension },
             };
 
         docRef.SetAsync(fileData).ContinueWith(task =>
@@ -70,44 +70,58 @@ public class FirestoreManager : MonoBehaviour
                 Debug.LogError("Error uploading file, file is likely too large: " + task.Exception);
             }
         });
+
+        // DocumentReference docRef = db.Collection("room").Document(roomCode);
+        // Dictionary<string, object> fileData = new Dictionary<string, object>
+        //     {
+        //         { "FileName", fileName },
+        //         { "UploadUser",  uploadUser },
+        //         { "Content", base64Content },
+        //         { "Extension", extension },
+        //     };
+
+        // docRef.SetAsync(fileData).ContinueWith(task =>
+        // {
+        //     if (task.IsCompleted)
+        //     {
+        //         Debug.Log("File uploaded successfully with ID: " + fileId);
+        //     }
+        //     else
+        //     {
+        //         Debug.LogError("Error uploading file, file is likely too large: " + task.Exception);
+        //     }
+        // });
     }
 
-    public void DownloadFileFromFirestore(string fileId)
-    {
-        Debug.Log("Download file from firestore");
-        DocumentReference docRef = db.Collection("file").Document(fileId);
-        docRef.GetSnapshotAsync().ContinueWith(task =>
-        {
-            if (task.IsCompleted)
-            {
-                DocumentSnapshot snapshot = task.Result;
+    // public void DownloadFileFromFirestore(string fileId, string savePath)
+    // {
+    //     Debug.Log("Download file from firestore");
+    //     DocumentReference docRef = db.Collection("file").Document(fileId);
+    //     docRef.GetSnapshotAsync().ContinueWith(task =>
+    //     {
+    //         if (task.IsCompleted)
+    //         {
+    //             DocumentSnapshot snapshot = task.Result;
 
-                if (snapshot.Exists)
-                {
-                    string fileName = snapshot.GetValue<string>("FileName");
+    //             if (snapshot.Exists)
+    //             {
+    //                 string base64Content = snapshot.GetValue<string>("Content");
+    //                 byte[] fileBytes = Convert.FromBase64String(base64Content);
+    //                 File.WriteAllBytes(savePath, fileBytes);
 
-                    // Commented out for now but will be used in future features, gives user who uploaded file
-                    // string uploadUser = snapshot.GetValue<string>("UploadUser");
-
-                    string base64Content = snapshot.GetValue<string>("Content");
-                    byte[] fileBytes = Convert.FromBase64String(base64Content);
-                    string extension = snapshot.GetValue<string>("Type");
-
-                    ExportFile.SaveFile(fileName, fileBytes, extension);
-
-                    Debug.Log("File downloaded and saved successfully.");
-                }
-                else
-                {
-                    Debug.LogError("File document not found.");
-                }
-            }
-            else
-            {
-                Debug.LogError("Error downloading file: " + task.Exception);
-            }
-        });
-    }
+    //                 Debug.Log("File downloaded and saved successfully.");
+    //             }
+    //             else
+    //             {
+    //                 Debug.LogError("File document not found.");
+    //             }
+    //         }
+    //         else
+    //         {
+    //             Debug.LogError("Error downloading file: " + task.Exception);
+    //         }
+    //     });
+    // }
 
     public void ListenToRoomCollection(string roomId, Action<List<string>> onFilesChanged)
     {
@@ -138,7 +152,6 @@ public class FirestoreManager : MonoBehaviour
                     }
 
                     onFilesChanged?.Invoke(currentFileIds);
-                    previousFileIds = new HashSet<string>(currentFileIds);
                 }
                 else
                 {
@@ -150,5 +163,29 @@ public class FirestoreManager : MonoBehaviour
                 Debug.LogWarning("Room document does not exist.");
             }
         });
+    }
+
+    public async Task<FileInfo> ReadFileInfo(string fileId)
+    {
+        FileInfo fileInfo = null;
+        DocumentReference docRef = db.Collection("file").Document(fileId);
+        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+        if (snapshot.Exists)
+        {
+            string fileName = snapshot.GetValue<string>("FileName");
+            string extension = snapshot.GetValue<string>("Extension");
+            string uploadUser = snapshot.GetValue<string>("UploadUser");
+            string base64Content = snapshot.GetValue<string>("Content");
+            byte[] content = Convert.FromBase64String(base64Content);
+
+            fileInfo = new FileInfo(fileId, fileName, extension, uploadUser, content);
+        }
+        else
+        {
+            Debug.LogError("File document: " + fileId + " not found.");
+        }
+
+        return fileInfo;
     }
 }

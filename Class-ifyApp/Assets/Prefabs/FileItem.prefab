@@ -440,9 +440,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fd825f567a4ec440ae6ea4f9d3d77b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fileName: {fileID: 626564598127637410}
+  fileTextDisplay: {fileID: 626564598127637410}
   downloadButton: {fileID: 5208751355077327298}
   deleteButton: {fileID: 5072009627832545195}
+  fileCabinetContent: {fileID: 0}
 --- !u!1 &8390521667120164476
 GameObject:
   m_ObjectHideFlags: 0

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using SFB;
 using UnityEngine.UI;
+using TMPro;
 
 public class ImportFile : MonoBehaviour
 {
     public Button importButton;
+    public TextMeshProUGUI roomCodeDisplay;
 
     void Start()
     {
@@ -26,7 +28,8 @@ public class ImportFile : MonoBehaviour
         string filePath = OpenFileDialog();
         if (!filePath.Equals(""))
         {
-            FirestoreManager.Instance.UploadFileToFirestore(filePath);
+            string roomCode = roomCodeDisplay.text.Split(" ")[2];
+            FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
         }
     }
 

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class FileCabinetContent : MonoBehaviour
 {
     public TextMeshProUGUI roomCodeDisplay;
     public GameObject filePrefab;
-    private List<FileItem> files;
     [SerializeField]
     private GridLayoutGroup fileGroup;
-    public List<string> currentFileIds;
+    private List<string> currentFileIds;
+    private Dictionary<string, GameObject> fileItemInstances = new Dictionary<string, GameObject>();
 
     void Start()
     {
@@ -21,25 +22,51 @@ public class FileCabinetContent : MonoBehaviour
         }
 
         string roomCode = roomCodeDisplay.text.Split(" ")[2];
+        currentFileIds = new List<string>();
         FirestoreManager.Instance.ListenToRoomCollection(roomCode, OnFilesChanged);
     }
 
-    private void OnFilesChanged(List<string> currentFileIds)
+    //TODO also remove file from db in room document and file collection
+    public void DeleteFile(string fileId)
     {
-        //TODO update UI
-        Debug.Log("Files have been changed");
-        this.currentFileIds = currentFileIds;
-
-        foreach (var fileId in currentFileIds)
+        Debug.Log("Deleting file: " + fileId);
+        if (fileItemInstances.TryGetValue(fileId, out GameObject fileInstance))
         {
-            Debug.Log("File: " + fileId);
+            Destroy(fileInstance);
+            fileItemInstances.Remove(fileId);
         }
-
-        UpdateFileContent();
     }
 
-    private void UpdateFileContent()
+    private async void OnFilesChanged(List<string> outputFileIds)
     {
+        var fileIdsToRemove = currentFileIds.Except(outputFileIds).ToList();
+        foreach (var fileId in fileIdsToRemove)
+        {
+            if (fileItemInstances.TryGetValue(fileId, out GameObject fileInstance))
+            {
+                Destroy(fileInstance);
+                fileItemInstances.Remove(fileId);
+            }
+        }
 
+        var fileIdsToAdd = outputFileIds.Except(currentFileIds).ToList();
+        foreach (var fileId in fileIdsToAdd)
+        {
+            GameObject newFileItem = Instantiate(filePrefab, fileGroup.transform);
+            FileItem fileItemComponent = newFileItem.GetComponent<FileItem>();
+
+            if (fileItemComponent != null)
+            {
+                FileInfo fileInfo = await FirestoreManager.Instance.ReadFileInfo(fileId.Trim());
+                fileItemComponent.SetFileInfo(fileInfo);
+                fileItemInstances[fileId] = newFileItem;
+            }
+            else
+            {
+                Debug.LogWarning("FilePrefab does not contain a FileItem component.");
+            }
+        }
+
+        this.currentFileIds = outputFileIds;
     }
 }
