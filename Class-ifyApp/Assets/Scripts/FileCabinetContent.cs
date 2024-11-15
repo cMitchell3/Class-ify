@@ -8,12 +8,14 @@ using System.Linq;
 public class FileCabinetContent : MonoBehaviour
 {
     public TextMeshProUGUI roomCodeDisplay;
+    public TextMeshProUGUI errorMessage;
     public GameObject filePrefab;
     [SerializeField]
     private GridLayoutGroup fileGroup;
     private List<string> currentFileIds;
     private Dictionary<string, GameObject> fileItemInstances = new Dictionary<string, GameObject>();
     private string roomCode;
+    private string userEmail;
 
     void Start()
     {
@@ -22,22 +24,31 @@ public class FileCabinetContent : MonoBehaviour
             Debug.LogError("Firestore or FirestoreManager instance is not initialized.");
         }
 
+        userEmail = FirebaseAuthManager.Instance.GetUserEmail();
+
         roomCode = roomCodeDisplay.text.Split(" ")[2];
         currentFileIds = new List<string>();
         FirestoreManager.Instance.ListenToRoomCollection(roomCode, OnFilesChanged);
     }
 
-    //TODO also remove file from db in room document and file collection
-    public void DeleteFile(string fileId)
+    public async void DeleteFile(string fileId)
     {
-        Debug.Log("Deleting file: " + fileId);
-        if (fileItemInstances.TryGetValue(fileId, out GameObject fileInstance))
+        string host = await FirestoreManager.Instance.GetRoomHostEmail(roomCode);
+        if (host.Equals(userEmail))
         {
-            Destroy(fileInstance);
-            fileItemInstances.Remove(fileId);
-        }
+            if (fileItemInstances.TryGetValue(fileId, out GameObject fileInstance))
+            {
+                Destroy(fileInstance);
+                fileItemInstances.Remove(fileId);
+            }
 
-        FirestoreManager.Instance.DeleteFileFromFirestore(fileId, roomCode);
+            FirestoreManager.Instance.DeleteFileFromFirestore(fileId, roomCode);
+        }
+        else
+        {
+            errorMessage.text = "Only the host can delete files!";
+            Debug.LogWarning("User is not host, so cannot delete files.");
+        }
     }
 
     private async void OnFilesChanged(List<string> outputFileIds)

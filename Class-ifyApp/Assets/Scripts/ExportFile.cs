@@ -15,7 +15,6 @@ public class ExportFile : MonoBehaviour
 
         if (!savePath.Equals(""))
         {
-            // FirestoreManager.Instance.DownloadFileFromFirestore(fileId, savePath);
             File.WriteAllBytes(savePath, content);
             Debug.Log("File saved at: " + savePath);
         }
