@@ -59,6 +59,21 @@ public class FirestoreManager : MonoBehaviour
         return hostEmail;
     }
 
+    public async void UpdateUserCurrency(string email, int amount)
+    {
+        DocumentReference docRef = db.Collection("user").Document(email);
+        int currentCoins = await GetUserCurrency(email);
+        int updateCoins = currentCoins + amount;
+
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "coins", updateCoins }
+        };
+
+        await docRef.UpdateAsync(updates);
+        Debug.Log($"Currency updated in Firestore: {updateCoins} coins for {email}");
+    }
+
     public void UploadFileToFirestore(string filePath, string roomCode)
     {
         string fileId = Guid.NewGuid().ToString();
@@ -146,7 +161,6 @@ public class FirestoreManager : MonoBehaviour
         });
     }
 
-
     public void ListenToRoomCollection(string roomId, Action<List<string>> onFilesChanged)
     {
         Debug.Log("Listening for room collection file changes");
@@ -189,7 +203,25 @@ public class FirestoreManager : MonoBehaviour
         });
     }
 
-    public async Task<FileInfo> ReadFileInfo(string fileId)
+    private async Task<int> GetUserCurrency(string email)
+    {
+        int coins = 0;
+        DocumentReference docRef = db.Collection("user").Document(email);
+        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+        if (snapshot.Exists)
+        {
+            coins = snapshot.GetValue<int>("coins");  
+        }
+        else
+        {
+            Debug.LogWarning("Error reading coins field from user " + email);
+        }
+
+        return coins;
+    }
+
+    public async Task<FileInfo> GetFileInfo(string fileId)
     {
         FileInfo fileInfo = null;
         DocumentReference docRef = db.Collection("file").Document(fileId);
