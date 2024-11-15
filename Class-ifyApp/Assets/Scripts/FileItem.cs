@@ -47,8 +47,6 @@ public class FileItem : MonoBehaviour
 
     private void OnDeleteButtonClicked()
     {
-        //TODO check if host
-        Debug.Log("Delete clicked");
         fileCabinetContent.DeleteFile(fileInfo.GetFileId());   
     }
 }

@@ -2,11 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using TMPro;
 
 public class FileCabinetLogic : MonoBehaviour
 {
     public GameObject fileCabinetObject;
     public GameObject playerController;
+    public TextMeshProUGUI errorMessage;
 
     public void ActivateFileCabinet()
     {
@@ -19,6 +21,7 @@ public class FileCabinetLogic : MonoBehaviour
         fileCabinetObject.SetActive(false);
         EventSystem.current.SetSelectedGameObject(null);
         EnablePlayerMovement(true);
+        errorMessage.text = "";
     }
 
     private void EnablePlayerMovement(bool isEnabled)

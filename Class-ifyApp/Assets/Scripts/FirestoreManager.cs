@@ -41,7 +41,24 @@ public class FirestoreManager : MonoBehaviour
         }
     }
 
-    //TODO attatch to room
+    public async Task<string> GetRoomHostEmail(string roomCode)
+    {
+        string hostEmail = "";
+        DocumentReference docRef = db.Collection("room").Document(roomCode);
+        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+        if (snapshot.Exists)
+        {
+            hostEmail = snapshot.GetValue<string>("Host");
+        }
+        else
+        {
+            Debug.LogError("Room document: " + roomCode + " not found.");
+        }
+
+        return hostEmail;
+    }
+
     public void UploadFileToFirestore(string filePath, string roomCode)
     {
         string fileId = Guid.NewGuid().ToString();
