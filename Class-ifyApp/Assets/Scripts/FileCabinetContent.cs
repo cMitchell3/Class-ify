@@ -71,7 +71,7 @@ public class FileCabinetContent : MonoBehaviour
 
             if (fileItemComponent != null)
             {
-                FileInfo fileInfo = await FirestoreManager.Instance.ReadFileInfo(fileId.Trim());
+                FileInfo fileInfo = await FirestoreManager.Instance.GetFileInfo(fileId.Trim());
                 fileItemComponent.SetFileInfo(fileInfo);
                 fileItemInstances[fileId] = newFileItem;
             }

@@ -9,6 +9,8 @@ public class ImportFile : MonoBehaviour
 {
     public Button importButton;
     public TextMeshProUGUI roomCodeDisplay;
+    private string userEmail;
+    private static int importCoins = 10;
 
     void Start()
     {
@@ -21,6 +23,8 @@ public class ImportFile : MonoBehaviour
         {
             importButton.onClick.AddListener(OnImportButtonClicked);
         }
+
+        userEmail = FirebaseAuthManager.Instance.GetUserEmail();
     }
 
     public void OnImportButtonClicked()
@@ -30,6 +34,7 @@ public class ImportFile : MonoBehaviour
         {
             string roomCode = roomCodeDisplay.text.Split(" ")[2];
             FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
+            FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
         }
     }
 

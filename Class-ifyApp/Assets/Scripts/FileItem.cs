@@ -42,7 +42,7 @@ public class FileItem : MonoBehaviour
 
     private void OnDownloadButtonClicked()
     {
-        ExportFile.SaveFile(fileInfo.GetFileName(), fileInfo.GetExtension(), fileInfo.GetContent());
+        ExportFile.SaveFile(fileInfo.GetFileName(), fileInfo.GetExtension(), fileInfo.GetContent(), fileInfo.GetUploadUser());
     }
 
     private void OnDeleteButtonClicked()
