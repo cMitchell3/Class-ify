@@ -45,6 +45,8 @@ MonoBehaviour:
   - DisplayThumbsUp
   - ReceiveThumbsUp
   - GetMessage
+  - ClearWhiteboardRPC
+  - ReceiveDrawLine
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

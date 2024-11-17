@@ -1,7 +1,9 @@
 using UnityEngine;
 using UnityEngine.UI;
+using Photon.Pun;
+using Photon.Realtime;
 
-public class WhiteboardDrawing : MonoBehaviour
+public class WhiteboardDrawing : MonoBehaviourPun
 {
     public Color drawColor = Color.black;
     public Color previousColor = Color.black;
@@ -57,7 +59,11 @@ public class WhiteboardDrawing : MonoBehaviour
                 {
                     lastDrawPosition = new Vector2(x, y);
                 }
-                DrawLine(lastDrawPosition, new Vector2(x, y));
+                //DrawLine(lastDrawPosition, new Vector2(x, y));
+
+                float[] colorData = {drawColor.r, drawColor.g, drawColor.b, drawColor.a};
+                // Call the DrawLine method locally and via RPC
+                photonView.RPC("ReceiveDrawLine", RpcTarget.All, lastDrawPosition, new Vector2(x, y), colorData);
                 lastDrawPosition = new Vector2(x, y);
             }
         }
@@ -67,19 +73,33 @@ public class WhiteboardDrawing : MonoBehaviour
         }
     }
 
-    void DrawLine(Vector2 start, Vector2 end)
+    [PunRPC]
+    private void ReceiveDrawLine(Vector2 start, Vector2 end, float[] colorData)
+    {
+        if (colorData.Length == 4)
+        {
+            Color receivedColor = new Color(colorData[0], colorData[1], colorData[2], colorData[3]);
+            DrawLine(start, end, receivedColor);
+        }
+        else
+        {
+            Debug.LogError("Invalid color data received.");
+        }
+    }
+
+    void DrawLine(Vector2 start, Vector2 end, Color lineColor)
     {
         int steps = Mathf.CeilToInt((end - start).magnitude);
         for (int i = 0; i <= steps; i++)
         {
             float t = i / (float)steps;
             Vector2 point = Vector2.Lerp(start, end, t);
-            DrawPoint(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y));
+            DrawPoint(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y), lineColor);
         }
         drawTexture.Apply();
     }
 
-    void DrawPoint(int x, int y)
+    void DrawPoint(int x, int y, Color lineColor)
     {
         for (int i = -brushSize; i <= brushSize; i++)
         {
@@ -95,14 +115,14 @@ public class WhiteboardDrawing : MonoBehaviour
                     float alpha = Mathf.Clamp01(1 - (distance / brushSize) / brushSoftness);
 
                     Color pixelColor = drawTexture.GetPixel(drawX, drawY);
-                    pixelColor = Color.Lerp(pixelColor, drawColor, alpha * drawColor.a);
+                    pixelColor = Color.Lerp(pixelColor, lineColor, alpha * lineColor.a);
                     drawTexture.SetPixel(drawX, drawY, pixelColor);
                 }
             }
         }
     }
 
-    public void ClearWhiteboard()
+    /*public void ClearWhiteboard()
     {
         Color[] clearColors = new Color[drawTexture.width * drawTexture.height];
         for (int i = 0; i < clearColors.Length; i++)
@@ -112,6 +132,28 @@ public class WhiteboardDrawing : MonoBehaviour
         drawTexture.SetPixels(clearColors);
         drawTexture.Apply();
         clearPanel.SetActive(!clearPanel.activeSelf);
+    }
+    */
+
+    public void ClearWhiteboard()
+    {
+        photonView.RPC("ClearWhiteboardRPC", RpcTarget.All);
+        if (photonView.IsMine)
+        {
+            clearPanel.SetActive(!clearPanel.activeSelf);
+        }
+    }
+
+    [PunRPC]
+    private void ClearWhiteboardRPC()
+    {
+        Color[] clearColors = new Color[drawTexture.width * drawTexture.height];
+        for (int i = 0; i < clearColors.Length; i++)
+        {
+            clearColors[i] = Color.white;
+        }
+        drawTexture.SetPixels(clearColors);
+        drawTexture.Apply();
     }
 
     private void SetDrawColor(Color newColor)
