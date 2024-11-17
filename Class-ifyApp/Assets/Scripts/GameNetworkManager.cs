@@ -33,6 +33,8 @@ namespace Com.CS.Classify
         public GameObject playerListElement; 
         private RoomNotificationManager roomNotificationManager;
         private FirebaseFirestore db;
+        private FirebaseAuth auth;
+        private FirebaseUser user;
 
         #endregion
 
@@ -43,6 +45,31 @@ namespace Com.CS.Classify
         {
             Debug.Log("Leaving room");
             PhotonNetwork.LeaveRoom();
+
+            RemoveUserFromArray();
+        }
+
+        // Remove user from ActiveUsers array in Firestore, to be called in GameNetworkManager
+        public void RemoveUserFromArray()
+        {
+            string roomCode = roomCodeDisplay.text.Split(" ")[2];
+
+            // Reference the Firestore document for the specific room
+            DocumentReference roomRef = db.Collection("room").Document(roomCode);
+
+            // Use ArrayRemove to remove the user email from the users array
+            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayRemove(user.Email))
+                .ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        Debug.Log($"User {user.Email} removed from room {roomCode}.");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Error removing user {user.Email} from room {roomCode}: {task.Exception}");
+                    }
+                });
         }
 
         #endregion
@@ -69,6 +96,8 @@ namespace Com.CS.Classify
             }
 
             db = FirebaseFirestore.DefaultInstance;
+            auth = FirebaseAuth.DefaultInstance;
+            user = auth.CurrentUser;
             
             if (db == null) 
             {

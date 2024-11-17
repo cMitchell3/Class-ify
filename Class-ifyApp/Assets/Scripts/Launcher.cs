@@ -105,6 +105,27 @@ namespace Com.CS.Classify
 
         #region Methods
 
+        // Adds a user to the ActiveUsers array in Firestore
+        public void AddUserToArray(string roomCode)
+        {
+            // Reference the Firestore document for the specific room
+            DocumentReference roomRef = db.Collection("room").Document(roomCode);
+
+            // Use ArrayUnion to add the user email to the users array
+            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayUnion(user.Email))
+                .ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        Debug.Log($"User {user.Email} added to room {roomCode}.");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Error adding user {user.Email} to room {roomCode}: {task.Exception}");
+                    }
+                });
+        }
+
         // Connect to master server
         public void Connect()
         {
@@ -245,6 +266,8 @@ namespace Com.CS.Classify
         public override void OnJoinedRoom()
         {
             JoinRoom();
+
+            AddUserToArray(roomCodeText);
         }
 
         // Called on join room failed
