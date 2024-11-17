@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
+using ExitGames.Client.Photon;
 
 public class WhiteboardDrawing : MonoBehaviourPun
 {
@@ -40,6 +41,9 @@ public class WhiteboardDrawing : MonoBehaviourPun
 
         // Set the sprite of the Image component
         imageComponent.sprite = Sprite.Create(drawTexture, new Rect(0, 0, drawTexture.width, drawTexture.height), Vector2.zero);
+
+        // Load the whiteboard state if available
+        LoadWhiteboardFromRoom();
     }
 
     void Update()
@@ -97,6 +101,8 @@ public class WhiteboardDrawing : MonoBehaviourPun
             DrawPoint(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y), lineColor);
         }
         drawTexture.Apply();
+
+        SaveWhiteboardToRoom();
     }
 
     void DrawPoint(int x, int y, Color lineColor)
@@ -154,6 +160,33 @@ public class WhiteboardDrawing : MonoBehaviourPun
         }
         drawTexture.SetPixels(clearColors);
         drawTexture.Apply();
+
+        // Save the cleared state
+        SaveWhiteboardToRoom();
+    }
+
+    private void SaveWhiteboardToRoom()
+    {
+        if (PhotonNetwork.InRoom)
+        {
+            byte[] textureData = drawTexture.EncodeToPNG(); // Compress texture
+            Hashtable whiteboardData = new Hashtable { { "WhiteboardState", textureData } };
+            PhotonNetwork.CurrentRoom.SetCustomProperties(whiteboardData);
+        }
+    }
+
+    private void LoadWhiteboardFromRoom()
+    {
+        if (PhotonNetwork.CurrentRoom != null && PhotonNetwork.CurrentRoom.CustomProperties.TryGetValue("WhiteboardState", out object textureData))
+        {
+            byte[] data = (byte[])textureData;
+            Texture2D loadedTexture = new Texture2D(drawTexture.width, drawTexture.height);
+            if (loadedTexture.LoadImage(data))
+            {
+                drawTexture.SetPixels(loadedTexture.GetPixels());
+                drawTexture.Apply();
+            }
+        }
     }
 
     private void SetDrawColor(Color newColor)
