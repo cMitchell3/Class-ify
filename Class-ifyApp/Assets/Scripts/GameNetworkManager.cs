@@ -145,7 +145,7 @@ namespace Com.CS.Classify
             yield return new WaitUntil(() => hostUsernameTask.IsCompleted);
             string hostUsername = hostUsernameTask.Result;
 
-            bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
+            // bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
             //bool isCurrentPlayerHost = "gongoozler" == hostUsername;
             // Debug.Log($"Player found with username: {PhotonNetwork.NickName}.");
             // Debug.Log($"Host found with username: {hostUsername}.");
@@ -156,11 +156,12 @@ namespace Com.CS.Classify
             //bool isCurrentPlayerHost = String.Equals("gongoozler", hostUsername);
 
             // Call PopulateKickMenu with the host info
-            StartCoroutine(PopulateKickMenu(isCurrentPlayerHost));
+            StartCoroutine(PopulateKickMenu(hostUsername));
         }
 
-        IEnumerator PopulateKickMenu(bool isCurrentPlayerHost)
+        IEnumerator PopulateKickMenu(string hostUsername)
         {
+            bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
             // Toggle KickMenu visibility
             kickMenu.gameObject.SetActive(!kickMenu.gameObject.activeSelf);
 
@@ -191,6 +192,12 @@ namespace Com.CS.Classify
                 // Assign player name to PlayerName text field
                 TextMeshProUGUI playerNameText = newElement.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
                 playerNameText.text = playerName;
+
+                if (playerNameText.text.Equals(hostUsername))
+                {
+                    Image hostStar = newElement.transform.Find("HostStar").GetComponent<Image>();
+                    hostStar.gameObject.SetActive(true);
+                }
 
                 // Set up KickButton functionality
                 Button kickButton = newElement.transform.Find("KickButton").GetComponent<Button>();
