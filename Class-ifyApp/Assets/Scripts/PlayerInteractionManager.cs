@@ -1,21 +1,36 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
 using Photon.Pun;
 
 public class PlayerInteractionManager : MonoBehaviourPun
 {
-    public GameObject thumbsUpIconPrefab; // Prefab for thumbs-up icon (assigned in inspector)
-    public Vector3 screenOffset = new Vector3(0f, 2f, 0f); // Offset for the button above the player
+    public GameObject interactionButtonPrefab; // Prefab for the button
+    public GameObject thumbsUpIconPrefab;      // Prefab for thumbs-up icon
+    public Vector3 screenOffset = new Vector3(0f, 2f, 0f); // Offset for UI above players
 
-    private Transform playerTransform; // Reference to this player's transform
-    private GameObject thumbsUpIconInstance; // Instance of thumbs-up icon for this player
+    private Transform playerTransform;       // Reference to this player's transform
+    private GameObject interactionButton;   // Instance of the interaction button
+    private GameObject thumbsUpIconInstance; // Instance of the thumbs-up icon
 
     void Start()
     {
         playerTransform = this.transform;
 
-        // Instantiate thumbs-up icon and set its parent to the canvas
+        // Instantiate interaction button
         GameObject canvas = GameObject.Find("Canvas");
+        if (canvas != null && interactionButtonPrefab != null)
+        {
+            interactionButton = Instantiate(interactionButtonPrefab, canvas.transform);
+            //interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
+            interactionButton.GetComponent<Button>().onClick.AddListener(ShowThumbsUpIcon);
+
+        }
+        else
+        {
+            Debug.LogError("Canvas or InteractionButtonPrefab not assigned.");
+        }
+
+        // Instantiate thumbs-up icon
         if (canvas != null && thumbsUpIconPrefab != null)
         {
             thumbsUpIconInstance = Instantiate(thumbsUpIconPrefab, canvas.transform);
@@ -23,23 +38,32 @@ public class PlayerInteractionManager : MonoBehaviourPun
         }
         else
         {
-            Debug.LogError("Canvas or ThumbsUpIconPrefab not assigned.");
+            Debug.LogError("ThumbsUpIconPrefab not assigned.");
         }
     }
 
     void LateUpdate()
     {
+        if (interactionButton != null && playerTransform != null)
+        {
+            // Convert player position to screen space and apply offset
+            Vector3 screenPoint = Camera.main.WorldToScreenPoint(playerTransform.position) + screenOffset;
+            interactionButton.transform.position = screenPoint;
+        }
+
         if (thumbsUpIconInstance != null && playerTransform != null)
         {
-            // Convert player position to screen space and apply the offset
+            // Same logic for the thumbs-up icon
             Vector3 screenPoint = Camera.main.WorldToScreenPoint(playerTransform.position) + screenOffset;
             thumbsUpIconInstance.transform.position = screenPoint;
         }
     }
 
-    public void OnMouseDown()
+    private void OnInteractionButtonClicked()
     {
-        // When a player is clicked, show thumbs-up icon on both players
+        Debug.Log($"Interaction button clicked for player: {photonView.Owner.NickName}");
+
+        // Call RPC to show thumbs-up icon on all clients
         if (PhotonNetwork.IsConnected)
         {
             photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
@@ -59,12 +83,12 @@ public class PlayerInteractionManager : MonoBehaviourPun
         }
     }
 
-    private IEnumerator ShowIconTemporarily()
+    private System.Collections.IEnumerator ShowIconTemporarily()
     {
-        thumbsUpIconInstance.SetActive(true); // Activate the thumbs-up icon
+        thumbsUpIconInstance.SetActive(true); // Activate thumbs-up icon
 
         yield return new WaitForSeconds(2); // Wait for 2 seconds
 
-        thumbsUpIconInstance.SetActive(false); // Deactivate the thumbs-up icon
+        thumbsUpIconInstance.SetActive(false); // Deactivate thumbs-up icon
     }
 }
