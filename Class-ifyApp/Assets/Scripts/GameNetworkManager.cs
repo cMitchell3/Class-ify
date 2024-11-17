@@ -58,16 +58,16 @@ namespace Com.CS.Classify
             DocumentReference roomRef = db.Collection("room").Document(roomCode);
 
             // Use ArrayRemove to remove the user email from the users array
-            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayRemove(user.Email))
+            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayRemove(PhotonNetwork.NickName))
                 .ContinueWithOnMainThread(task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.Log($"User {user.Email} removed from room {roomCode}.");
+                        Debug.Log($"User {PhotonNetwork.NickName} removed from room {roomCode}.");
                     }
                     else
                     {
-                        Debug.LogError($"Error removing user {user.Email} from room {roomCode}: {task.Exception}");
+                        Debug.LogError($"Error removing user {PhotonNetwork.NickName} from room {roomCode}: {task.Exception}");
                     }
                 });
         }
