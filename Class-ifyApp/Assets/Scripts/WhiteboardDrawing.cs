@@ -102,7 +102,11 @@ public class WhiteboardDrawing : MonoBehaviourPun
         }
         drawTexture.Apply();
 
-        SaveWhiteboardToRoom();
+        if (Time.frameCount % 50 == 0)
+        {
+            SaveWhiteboardToRoom();
+        }
+
     }
 
     void DrawPoint(int x, int y, Color lineColor)
