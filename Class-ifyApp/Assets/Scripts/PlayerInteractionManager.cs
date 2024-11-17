@@ -4,25 +4,42 @@ using Photon.Pun;
 
 public class PlayerInteractionManager : MonoBehaviourPun
 {
-    // Reference to the thumbs up icon
-    public GameObject thumbsUpIcon;
+    public GameObject thumbsUpIconPrefab; // Prefab for thumbs-up icon (assigned in inspector)
+    public Vector3 screenOffset = new Vector3(0f, 2f, 0f); // Offset for the button above the player
 
-    private void Start()
+    private Transform playerTransform; // Reference to this player's transform
+    private GameObject thumbsUpIconInstance; // Instance of thumbs-up icon for this player
+
+    void Start()
     {
-        // Ensure the thumbs-up icon is initially inactive
-        if (thumbsUpIcon != null)
+        playerTransform = this.transform;
+
+        // Instantiate thumbs-up icon and set its parent to the canvas
+        GameObject canvas = GameObject.Find("Canvas");
+        if (canvas != null && thumbsUpIconPrefab != null)
         {
-            thumbsUpIcon.SetActive(false);
+            thumbsUpIconInstance = Instantiate(thumbsUpIconPrefab, canvas.transform);
+            thumbsUpIconInstance.SetActive(false); // Initially inactive
         }
         else
         {
-            Debug.LogError("ThumbsUpIcon is not assigned in the inspector.");
+            Debug.LogError("Canvas or ThumbsUpIconPrefab not assigned.");
         }
     }
 
-    private void OnMouseDown()
+    void LateUpdate()
     {
-        // When this player is clicked, trigger the thumbs-up icon to appear for both players
+        if (thumbsUpIconInstance != null && playerTransform != null)
+        {
+            // Convert player position to screen space and apply the offset
+            Vector3 screenPoint = Camera.main.WorldToScreenPoint(playerTransform.position) + screenOffset;
+            thumbsUpIconInstance.transform.position = screenPoint;
+        }
+    }
+
+    public void OnMouseDown()
+    {
+        // When a player is clicked, show thumbs-up icon on both players
         if (PhotonNetwork.IsConnected)
         {
             photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
@@ -36,24 +53,18 @@ public class PlayerInteractionManager : MonoBehaviourPun
     [PunRPC]
     public void ShowThumbsUpIcon()
     {
-        Debug.Log("Player Clicked.");
-        if (thumbsUpIcon != null)
+        if (thumbsUpIconInstance != null)
         {
-            Debug.Log("Starting Coroutine.");
             StartCoroutine(ShowIconTemporarily());
         }
     }
 
     private IEnumerator ShowIconTemporarily()
     {
-        // Activate the thumbs-up icon
-        Debug.Log("Setting Active.");
-        thumbsUpIcon.SetActive(true);
+        thumbsUpIconInstance.SetActive(true); // Activate the thumbs-up icon
 
-        // Wait for 2 seconds
-        yield return new WaitForSeconds(2);
+        yield return new WaitForSeconds(2); // Wait for 2 seconds
 
-        // Deactivate the thumbs-up icon
-        thumbsUpIcon.SetActive(false);
+        thumbsUpIconInstance.SetActive(false); // Deactivate the thumbs-up icon
     }
 }
