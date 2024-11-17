@@ -11,6 +11,7 @@ using Photon.Realtime;
 using Firebase.Auth;
 using Firebase.Firestore;
 using Firebase.Extensions;
+using UnityEngine.SceneManagement;
 
 namespace Com.CS.Classify
 {
@@ -23,6 +24,7 @@ namespace Com.CS.Classify
         public Button plusButton;
         public Button minusButton;
         public Button createRoomButton;
+        public Button backButton;
         public LinearCongruentialGenerator codeGenerationLogic;
 
         // Values
@@ -41,6 +43,11 @@ namespace Com.CS.Classify
             if (createRoomButton != null)
             {
                 createRoomButton.onClick.AddListener(OnCreateRoomButtonClicked);
+            }
+            
+            if (backButton != null)
+            {
+                backButton.onClick.AddListener(OnBackButtonClicked);
             }
 
             db = FirebaseFirestore.DefaultInstance;
@@ -117,6 +124,11 @@ namespace Com.CS.Classify
                 Debug.LogError("Error: Failed to check for user document: " + ex.Message);
                 return null;
             }
+        }
+
+        void OnBackButtonClicked()
+        {
+            SceneManager.LoadScene("MainMenuScene");
         }
 
         async void OnCreateRoomButtonClicked()
