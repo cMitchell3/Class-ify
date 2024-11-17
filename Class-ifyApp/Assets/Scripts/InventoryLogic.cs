@@ -5,20 +5,24 @@ using UnityEngine.SceneManagement;
 
 public class InventoryLogic : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+    [SerializeField] private GameObject playerCosmeticsMenu;
+    [SerializeField] private GameObject roomCosmeticsMenu;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void BackButton()
     {
         SceneManager.LoadScene("MainMenuScene");
+    }
+
+    public void PlayerCosmeticsButton()
+    {
+        roomCosmeticsMenu.SetActive(false);
+        playerCosmeticsMenu.SetActive(true);
+    }
+
+    public void RoomCosmeticsButton()
+    {
+        playerCosmeticsMenu.SetActive(false);
+        roomCosmeticsMenu.SetActive(true);
     }
 }
