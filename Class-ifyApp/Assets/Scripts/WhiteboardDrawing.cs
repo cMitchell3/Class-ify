@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
+using System.Collections.Generic;
 
 public class WhiteboardDrawing : MonoBehaviourPun
 {
@@ -19,9 +20,14 @@ public class WhiteboardDrawing : MonoBehaviourPun
     public GameObject colorPanel;
     public GameObject clearPanel;
 
+    private float updateInterval = 0.1f; // Time interval for updates (in seconds)
+    private float timeSinceLastUpdate = 0f;
+    private List<Vector2> drawBuffer = new List<Vector2>();
+
     void Start()
     {
         rectTransform = GetComponent<RectTransform>();
+
         imageComponent = GetComponent<Image>();
 
         // Create a higher resolution texture
@@ -44,10 +50,12 @@ public class WhiteboardDrawing : MonoBehaviourPun
 
         // Load the whiteboard state if available
         LoadWhiteboardFromRoom();
+
     }
 
     void Update()
     {
+        timeSinceLastUpdate += Time.deltaTime;
         if (Input.GetMouseButton(0))
         {
             Vector2 localPoint;
@@ -59,31 +67,63 @@ public class WhiteboardDrawing : MonoBehaviourPun
 
             if (x >= 0 && x < drawTexture.width && y >= 0 && y < drawTexture.height)
             {
-                if (lastDrawPosition == Vector2.zero)
+                Vector2 currentDrawPosition = new Vector2(x, y);
+                if (lastDrawPosition != Vector2.zero)
                 {
-                    lastDrawPosition = new Vector2(x, y);
+                    // Interpolate between last and current position
+                    int steps = Mathf.CeilToInt((currentDrawPosition - lastDrawPosition).magnitude * 2);
+                    for (int i = 0; i <= steps; i++)
+                    {
+                        float t = i / (float)steps;
+                        Vector2 interpolatedPoint = Vector2.Lerp(lastDrawPosition, currentDrawPosition, t);
+                        drawBuffer.Add(interpolatedPoint);
+                        DrawPoint(Mathf.RoundToInt(interpolatedPoint.x), Mathf.RoundToInt(interpolatedPoint.y), drawColor);
+                    }
                 }
-                //DrawLine(lastDrawPosition, new Vector2(x, y));
+                else
+                {
+                    drawBuffer.Add(currentDrawPosition);
+                    DrawPoint(x, y, drawColor);
+                }
 
-                float[] colorData = {drawColor.r, drawColor.g, drawColor.b, drawColor.a};
-                // Call the DrawLine method locally and via RPC
-                photonView.RPC("ReceiveDrawLine", RpcTarget.All, lastDrawPosition, new Vector2(x, y), colorData);
-                lastDrawPosition = new Vector2(x, y);
+                lastDrawPosition = currentDrawPosition;
+
+                if (timeSinceLastUpdate >= updateInterval && drawBuffer.Count > 0)
+                {
+                    float[] colorData = { drawColor.r, drawColor.g, drawColor.b, drawColor.a };
+                    // Call the ReceiveDrawLine method via RPC
+                    photonView.RPC("ReceiveDrawLine", RpcTarget.All, drawBuffer.ToArray(), colorData);
+                    drawBuffer.Clear();
+                    timeSinceLastUpdate = 0f;
+                }
             }
         }
-        else
+        else if (lastDrawPosition != Vector2.zero)
         {
+            if (drawBuffer.Count > 0)
+            {
+                float[] colorData = { drawColor.r, drawColor.g, drawColor.b, drawColor.a };
+                // Call the ReceiveDrawLine method via RPC
+                photonView.RPC("ReceiveDrawLine", RpcTarget.All, drawBuffer.ToArray(), colorData);
+                drawBuffer.Clear();
+            }
+            //Save after drawing (lifting up pen)
+            SaveWhiteboardToRoom();
             lastDrawPosition = Vector2.zero;
         }
+        drawTexture.Apply();
     }
 
     [PunRPC]
-    private void ReceiveDrawLine(Vector2 start, Vector2 end, float[] colorData)
+    private void ReceiveDrawLine(Vector2[] points, float[] colorData)
     {
         if (colorData.Length == 4)
         {
             Color receivedColor = new Color(colorData[0], colorData[1], colorData[2], colorData[3]);
-            DrawLine(start, end, receivedColor);
+            for (int i = 1; i < points.Length; i++)
+            {
+                DrawLine(points[i - 1], points[i], receivedColor);
+            }
         }
         else
         {
@@ -101,11 +141,6 @@ public class WhiteboardDrawing : MonoBehaviourPun
             DrawPoint(Mathf.RoundToInt(point.x), Mathf.RoundToInt(point.y), lineColor);
         }
         drawTexture.Apply();
-
-        if (Time.frameCount % 50 == 0)
-        {
-            SaveWhiteboardToRoom();
-        }
 
     }
 
@@ -132,26 +167,11 @@ public class WhiteboardDrawing : MonoBehaviourPun
         }
     }
 
-    /*public void ClearWhiteboard()
-    {
-        Color[] clearColors = new Color[drawTexture.width * drawTexture.height];
-        for (int i = 0; i < clearColors.Length; i++)
-        {
-            clearColors[i] = Color.white;
-        }
-        drawTexture.SetPixels(clearColors);
-        drawTexture.Apply();
-        clearPanel.SetActive(!clearPanel.activeSelf);
-    }
-    */
-
     public void ClearWhiteboard()
     {
         photonView.RPC("ClearWhiteboardRPC", RpcTarget.All);
-        if (photonView.IsMine)
-        {
-            clearPanel.SetActive(!clearPanel.activeSelf);
-        }
+        clearPanel.SetActive(!clearPanel.activeSelf);
+        
     }
 
     [PunRPC]
@@ -169,13 +189,14 @@ public class WhiteboardDrawing : MonoBehaviourPun
         SaveWhiteboardToRoom();
     }
 
-    private void SaveWhiteboardToRoom()
+    public void SaveWhiteboardToRoom()
     {
         if (PhotonNetwork.InRoom)
         {
             byte[] textureData = drawTexture.EncodeToPNG(); // Compress texture
             Hashtable whiteboardData = new Hashtable { { "WhiteboardState", textureData } };
             PhotonNetwork.CurrentRoom.SetCustomProperties(whiteboardData);
+            Debug.Log("Whiteboard has been saved");
         }
     }
 
