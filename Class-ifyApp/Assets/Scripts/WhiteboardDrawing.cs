@@ -4,6 +4,8 @@ using Photon.Pun;
 using Photon.Realtime;
 using ExitGames.Client.Photon;
 using System.Collections.Generic;
+using SFB;
+using System.IO;
 
 public class WhiteboardDrawing : MonoBehaviourPun
 {
@@ -19,6 +21,7 @@ public class WhiteboardDrawing : MonoBehaviourPun
     private Image imageComponent;
     public GameObject colorPanel;
     public GameObject clearPanel;
+    public Button saveButton;
 
     private float updateInterval = 0.1f; // Time interval for updates (in seconds)
     private float timeSinceLastUpdate = 0f;
@@ -26,6 +29,12 @@ public class WhiteboardDrawing : MonoBehaviourPun
 
     void Start()
     {
+        // Add a listener to the SaveButton
+        if (saveButton != null)
+        {
+            saveButton.onClick.AddListener(DownloadWhiteboard);
+        }
+
         rectTransform = GetComponent<RectTransform>();
 
         imageComponent = GetComponent<Image>();
@@ -298,4 +307,25 @@ public class WhiteboardDrawing : MonoBehaviourPun
         Color purple = new Color(0.7f, 0, 0.7f, 1);
         SetDrawColor(purple);  
     }
+
+    public void DownloadWhiteboard()
+    {
+        // Open a file save dialog to choose the location and file name
+        string path = StandaloneFileBrowser.SaveFilePanel("Save Whiteboard", "", "Whiteboard", "png");
+
+        // If the user selected a location, save the file
+        if (!string.IsNullOrEmpty(path))
+        {
+
+            // Encode the current whiteboard texture as a PNG file
+            byte[] textureData = drawTexture.EncodeToPNG();
+
+            // Write the PNG data to the chosen file
+            File.WriteAllBytes(path, textureData);
+            Debug.Log("Whiteboard saved to " + path);
+        }
+    }
+
+
+
 }
