@@ -48,16 +48,14 @@ public class ImportFile : MonoBehaviour
                 errorMessage.text = "Uploading...";
                 await FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
                 FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
-                // errorMessage.color = errorRed;
+                errorMessage.color = errorRed;
                 errorMessage.text = "";
             }
             catch (Exception e)
             {
-                // errorMessage.color = errorRed;
+                errorMessage.color = errorRed;
                 errorMessage.text = "Error uploading file, is your file too large (>1MB)?";
             }
-
-            errorMessage.color = errorRed;
         }
     }
 
