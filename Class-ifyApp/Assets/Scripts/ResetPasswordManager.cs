@@ -24,6 +24,7 @@ public class ResetPasswordManager : MonoBehaviour
     public TMP_Text warningText;
     public TMP_Text confirmationText;
 
+
     // Start is called before the first frame update
     void Start()
     {
@@ -91,5 +92,10 @@ public class ResetPasswordManager : MonoBehaviour
             warningText.text = "";
             confirmationText.text = "Password reset email sent successfully.";
         });
+    }
+
+    public void backButtonPressed()
+    {
+        SceneManager.LoadScene("LoginMenuScene");
     }
 }

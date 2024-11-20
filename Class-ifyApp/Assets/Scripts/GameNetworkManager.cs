@@ -35,15 +35,17 @@ namespace Com.CS.Classify
         private FirebaseFirestore db;
         private FirebaseAuth auth;
         private FirebaseUser user;
+        public WhiteboardDrawing whiteboardDrawing;
 
         #endregion
 
         #region Public Methods
 
         // Player leaves room
-        public void LeaveRoom()
+        public async void LeaveRoom()
         {
             Debug.Log("Leaving room");
+            await HandleHostCheckWhiteboard();
             PhotonNetwork.LeaveRoom();
 
             RemoveUserFromArray();
@@ -157,6 +159,30 @@ namespace Com.CS.Classify
 
             // Call PopulateKickMenu with the host info
             StartCoroutine(PopulateKickMenu(hostUsername));
+        }
+
+        public async Task<bool> FetchHost()
+        {
+            try
+            {
+                // Fetch room data
+                DocumentSnapshot fetchHostResult = await GetRoomDataAsync();
+                if (fetchHostResult == null)
+                {
+                    Debug.LogError("Failed to retrieve room data.");
+                    return false;
+                }
+
+                // Get the host name
+                string hostUsername = await FetchHostUsernameAsync();
+                bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
+                return isCurrentPlayerHost;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error fetching host: " + ex.Message);
+                return false;
+            }
         }
 
         IEnumerator PopulateKickMenu(string hostUsername)
@@ -367,6 +393,7 @@ namespace Com.CS.Classify
         public override void OnPlayerLeftRoom(Player other)
         {
             string username = other.NickName;
+
             Debug.LogFormat("OnPlayerLeftRoom() {0}", username);
             FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(username);
 
@@ -375,6 +402,20 @@ namespace Com.CS.Classify
                 Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
             }
         }
+
+        private async Task HandleHostCheckWhiteboard()
+        {
+            //Unlocks whiteboard if still locked
+            bool isHost = await FetchHost();
+            if (isHost)
+            {
+                if (whiteboardDrawing != null && whiteboardDrawing.IsLocked)
+                {
+                    Debug.Log("Unlocking whiteboard since host left");
+                    whiteboardDrawing.ToggleLock();
+                } 
+            }
+        }      
 
         #endregion
     }

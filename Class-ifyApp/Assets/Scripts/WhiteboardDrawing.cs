@@ -6,6 +6,7 @@ using ExitGames.Client.Photon;
 using System.Collections.Generic;
 using SFB;
 using System.IO;
+using Com.CS.Classify;
 
 public class WhiteboardDrawing : MonoBehaviourPun
 {
@@ -14,6 +15,8 @@ public class WhiteboardDrawing : MonoBehaviourPun
     public int brushSize = 4; // Increased for smoother lines
     public float brushSoftness = 0.5f; // Controls the softness of the brush edges
     private bool isEraserMode = false;
+    private Color blueLockColor;
+    private Color orangeLockColor;
 
     private Texture2D drawTexture;
     private RectTransform rectTransform;
@@ -22,10 +25,21 @@ public class WhiteboardDrawing : MonoBehaviourPun
     public GameObject colorPanel;
     public GameObject clearPanel;
     public Button saveButton;
+    public Button lockButton;
+    private bool isLocked = false;
+    public Sprite lockedSprite;
+    public Sprite unlockedSprite;
+    public GameNetworkManager gameNetworkManager;
+    private bool isHost;
 
     private float updateInterval = 0.1f; // Time interval for updates (in seconds)
     private float timeSinceLastUpdate = 0f;
     private List<Vector2> drawBuffer = new List<Vector2>();
+
+    public bool IsLocked
+    {
+        get { return isLocked; }
+    }
 
     void Start()
     {
@@ -34,6 +48,15 @@ public class WhiteboardDrawing : MonoBehaviourPun
         {
             saveButton.onClick.AddListener(DownloadWhiteboard);
         }
+        ColorUtility.TryParseHtmlString("#009BFF", out blueLockColor);
+        ColorUtility.TryParseHtmlString("#FF7E00", out orangeLockColor);
+
+        if (lockButton != null)
+        {
+            lockButton.onClick.AddListener(ToggleLock);
+        }
+
+        CheckIfUserIsHost();
 
         rectTransform = GetComponent<RectTransform>();
 
@@ -64,6 +87,10 @@ public class WhiteboardDrawing : MonoBehaviourPun
 
     void Update()
     {
+        if (isLocked && isHost == false)
+        {
+            return;
+        }
         timeSinceLastUpdate += Time.deltaTime;
         if (Input.GetMouseButton(0))
         {
@@ -272,6 +299,10 @@ public class WhiteboardDrawing : MonoBehaviourPun
 
     public void ActivateClearPanel()
     {
+        if (isLocked && isHost == false)
+        {
+            return;
+        }
         clearPanel.SetActive(!clearPanel.activeSelf);
     }
 
@@ -279,12 +310,14 @@ public class WhiteboardDrawing : MonoBehaviourPun
     {
         isEraserMode = false;
         SetDrawColor(Color.red);
+        colorPanel.SetActive(!colorPanel.activeSelf);
     }
 
     public void OnBlackButtonClick()
     {
         isEraserMode = false;
         SetDrawColor(Color.black);
+        colorPanel.SetActive(!colorPanel.activeSelf);
     }
 
     public void OnGreenButtonClick()
@@ -292,6 +325,7 @@ public class WhiteboardDrawing : MonoBehaviourPun
         isEraserMode = false;
         Color green = new Color(0, 0.75f, 0, 1);
         SetDrawColor(green);
+        colorPanel.SetActive(!colorPanel.activeSelf);
     }
 
     public void OnBlueButtonClick()
@@ -299,13 +333,15 @@ public class WhiteboardDrawing : MonoBehaviourPun
         isEraserMode = false;
         Color blue = new Color(0, 0, 0.95f, 1);
         SetDrawColor(blue);
+        colorPanel.SetActive(!colorPanel.activeSelf);
     }
 
     public void OnPurpleButtonClick()
     {
         isEraserMode = false;
         Color purple = new Color(0.7f, 0, 0.7f, 1);
-        SetDrawColor(purple);  
+        SetDrawColor(purple);
+        colorPanel.SetActive(!colorPanel.activeSelf);
     }
 
     public void DownloadWhiteboard()
@@ -326,6 +362,41 @@ public class WhiteboardDrawing : MonoBehaviourPun
         }
     }
 
+    public void ToggleLock()
+    {
+        isLocked = !isLocked;
 
+        ColorBlock buttonColors = lockButton.colors;
 
+        buttonColors.normalColor = isLocked ? orangeLockColor : blueLockColor;
+        lockButton.colors = buttonColors;
+
+        Transform childImageTransform = lockButton.transform.Find("Image");
+        if (childImageTransform != null)
+        {
+            Image childImage = childImageTransform.GetComponent<Image>();
+            if (childImage != null)
+            {
+                // Update the sprite of the child image
+                childImage.sprite = isLocked ? lockedSprite : unlockedSprite;
+            }
+        }
+        // Inform all users that the whiteboard has been locked or unlocked
+        photonView.RPC("UpdateLockState", RpcTarget.All, isLocked);
+    }
+
+    [PunRPC]
+    private void UpdateLockState(bool locked)
+    {
+        isLocked = locked;
+    }
+
+    private async void CheckIfUserIsHost()
+    {
+        if (gameNetworkManager != null)
+        {
+            // Fetch the host status asynchronously
+            isHost = await gameNetworkManager.FetchHost();
+        }
+    }
 }
