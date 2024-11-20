@@ -74,7 +74,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
         if (PhotonNetwork.IsConnected)
         {
             photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
-            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, 10);
+            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, photonView.Owner.UserId, 10);
         }
         else
         {
@@ -101,19 +101,23 @@ public class PlayerInteractionManager : MonoBehaviourPun
     }
 
     [PunRPC]
-    public void RewardCoins(int amount)
+    public void RewardCoins(string targetUserId, int amount)
     {
         // Find the CurrencyDisplayController in the scene
-        CurrencyDisplayController currencyController = FindObjectOfType<CurrencyDisplayController>();
+        if (PhotonNetwork.LocalPlayer.UserId == targetUserId)
+        {
+           // Find the CurrencyDisplayController for the local player
+            CurrencyDisplayController currencyController = FindObjectOfType<CurrencyDisplayController>();
 
-        if (currencyController != null)
-        {
-            currencyController.AddNumber(amount); // Update coin count
-            Debug.Log($"Added {amount} coins to {photonView.Owner.NickName}");
-        }
-        else
-        {
-            Debug.LogWarning("CurrencyDisplayController not found in the scene.");
-        }
+            if (currencyController != null)
+            {
+                currencyController.AddNumber(amount); // Add coins
+                Debug.Log($"Added {amount} coins to {photonView.Owner.NickName}");
+            }
+            else
+            {
+                Debug.LogWarning("CurrencyDisplayController not found for the local player.");
+            }
+        }       
     }
 }
