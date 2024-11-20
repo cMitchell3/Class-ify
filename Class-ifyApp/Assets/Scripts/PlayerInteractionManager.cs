@@ -21,9 +21,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
         if (canvas != null && interactionButtonPrefab != null)
         {
             interactionButton = Instantiate(interactionButtonPrefab, canvas.transform);
-            //interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
             interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
-
         }
         else
         {
@@ -42,12 +40,12 @@ public class PlayerInteractionManager : MonoBehaviourPun
         }
 
         if (photonView != null)
-            {
-               Debug.Log("PhotonView found on this GameObject!!!!!!!!");
-            }
-            else
-            {
-               Debug.LogError("PhotonView is missing on this GameObject!");
+        {
+            Debug.Log("PhotonView found on this GameObject!");
+        }
+        else
+        {
+            Debug.LogError("PhotonView is missing on this GameObject!");
         }
     }
 
@@ -72,10 +70,11 @@ public class PlayerInteractionManager : MonoBehaviourPun
     {
         Debug.Log($"Interaction button clicked for player: {photonView.Owner.NickName}");
 
-        // Call RPC to show thumbs-up icon on all clients
+        // Call RPC to show thumbs-up icon on all clients and reward coins to the clicked player
         if (PhotonNetwork.IsConnected)
         {
             photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
+            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, 10);
         }
         else
         {
@@ -99,5 +98,22 @@ public class PlayerInteractionManager : MonoBehaviourPun
         yield return new WaitForSeconds(2); // Wait for 2 seconds
 
         thumbsUpIconInstance.SetActive(false); // Deactivate thumbs-up icon
+    }
+
+    [PunRPC]
+    public void RewardCoins(int amount)
+    {
+        // Find the CurrencyDisplayController in the scene
+        CurrencyDisplayController currencyController = FindObjectOfType<CurrencyDisplayController>();
+
+        if (currencyController != null)
+        {
+            currencyController.AddNumber(amount); // Update coin count
+            Debug.Log($"Added {amount} coins to {photonView.Owner.NickName}");
+        }
+        else
+        {
+            Debug.LogWarning("CurrencyDisplayController not found in the scene.");
+        }
     }
 }

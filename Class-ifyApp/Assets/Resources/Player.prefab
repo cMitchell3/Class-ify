@@ -619,6 +619,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bb143a38f43994b4e95f14b925b51fff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactionButtonPrefab: {fileID: 4901614141991782749, guid: b119e9a2f2e4e8a4d9ad536fbebc4783, type: 3}
-  thumbsUpIconPrefab: {fileID: 4016571156223011415, guid: 758b100fea8d14c448199fa210807d16, type: 3}
+  interactionButtonPrefab: {fileID: 0}
+  thumbsUpIconPrefab: {fileID: 0}
   screenOffset: {x: 0, y: 2, z: 0}
