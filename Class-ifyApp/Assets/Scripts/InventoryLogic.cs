@@ -14,6 +14,12 @@ public class InventoryLogic : MonoBehaviour
     private Button bucketHatButton;
     private Button cowHatButton;
 
+    private Image topHatBackground;
+    private Image bucketHatBackground;
+    private Image cowHatBackground;
+
+    private string buttonHexColor = "#0D043D";
+
 
     void Start()
     {
@@ -34,6 +40,23 @@ public class InventoryLogic : MonoBehaviour
         topHatButton.onClick.AddListener(EquipTopHat);
         bucketHatButton.onClick.AddListener(EquipBucketHat);
         cowHatButton.onClick.AddListener(EquipCowHat);
+
+        topHatBackground = topHatButton.GetComponent<Image>();
+        bucketHatBackground = bucketHatButton.GetComponent<Image>();
+        cowHatBackground = cowHatButton.GetComponent<Image>();
+
+        if (cosmeticLogic.topHatEquipped)
+        {
+            topHatBackground.color = Color.green;
+        }
+        if (cosmeticLogic.bucketHatEquipped)
+        {
+            bucketHatBackground.color = Color.green;
+        }
+        if (cosmeticLogic.cowHatEquipped)
+        {
+            cowHatBackground.color = Color.green;
+        }
     }
 
     public void BackButton()
@@ -55,10 +78,15 @@ public class InventoryLogic : MonoBehaviour
 
     public void EquipTopHat()
     {
-        CosmeticLogic.Instance.topHatEquipped = true;
+        cosmeticLogic.topHatEquipped = true;
 
         cosmeticLogic.cowHatEquipped = false;
         cosmeticLogic.bucketHatEquipped = false;
+
+        // Change color on select
+        topHatBackground.color = Color.green;
+        bucketHatBackground.color = Color.magenta;
+        cowHatBackground.color = Color.magenta;
     }
 
     public void EquipCowHat()
@@ -67,6 +95,11 @@ public class InventoryLogic : MonoBehaviour
 
         cosmeticLogic.bucketHatEquipped = false;
         cosmeticLogic.topHatEquipped = false;
+
+        // Change color on select
+        topHatBackground.color = Color.magenta;
+        bucketHatBackground.color = Color.magenta;
+        cowHatBackground.color = Color.green;
     }
 
     public void EquipBucketHat()
@@ -75,6 +108,11 @@ public class InventoryLogic : MonoBehaviour
 
         cosmeticLogic.topHatEquipped = false;
         cosmeticLogic.cowHatEquipped = false;
+
+        // Change color on select
+        topHatBackground.color = Color.magenta;
+        bucketHatBackground.color = Color.green;
+        cowHatBackground.color = Color.magenta;
     }
 
     public void EquipNothing()
@@ -82,5 +120,10 @@ public class InventoryLogic : MonoBehaviour
         cosmeticLogic.topHatEquipped = false;
         cosmeticLogic.cowHatEquipped = false;
         cosmeticLogic.bucketHatEquipped = false;
+
+        // Change color on select
+        topHatBackground.color = Color.magenta;
+        bucketHatBackground.color = Color.magenta;
+        cowHatBackground.color = Color.magenta;
     }
 }

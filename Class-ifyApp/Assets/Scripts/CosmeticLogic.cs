@@ -32,7 +32,6 @@ public class CosmeticLogic : MonoBehaviour
 
     void Update()
     {
-        Debug.Log("Top Hat " + topHatEquipped);
         if (SceneManager.GetActiveScene().name == "RoomScene")
         {
             FindPlayer();
