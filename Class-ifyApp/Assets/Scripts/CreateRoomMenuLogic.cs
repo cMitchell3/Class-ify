@@ -181,6 +181,29 @@ namespace Com.CS.Classify
         public override void OnJoinedRoom()
         {
             JoinRoom();
+
+            AddUserToArray(roomCodeText);
+        }
+
+        // Adds the creator of the room to the active user array in Firestore
+        public void AddUserToArray(string roomCode)
+        {
+            // Reference the Firestore document for the specific room
+            DocumentReference roomRef = db.Collection("room").Document(roomCode);
+
+            // Use ArrayUnion to add the user email to the users array
+            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayUnion(PhotonNetwork.NickName))
+                .ContinueWithOnMainThread(task =>
+                {
+                    if (task.IsCompletedSuccessfully)
+                    {
+                        Debug.Log($"User {PhotonNetwork.NickName} added to room {roomCode}.");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Error adding user {PhotonNetwork.NickName} to room {roomCode}: {task.Exception}");
+                    }
+                });
         }
 
          private void FailCreateRoom(bool randomCodeFlag)
