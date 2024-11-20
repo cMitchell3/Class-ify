@@ -6896,6 +6896,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   importButton: {fileID: 1958785731}
+  errorMessage: {fileID: 1435178139}
   roomCodeDisplay: {fileID: 1058122100}
 --- !u!1 &364384197
 GameObject:
