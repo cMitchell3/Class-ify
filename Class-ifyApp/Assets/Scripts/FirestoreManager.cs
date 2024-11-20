@@ -221,6 +221,28 @@ public class FirestoreManager : MonoBehaviour
         return coins;
     }
 
+    public async Task<UserLoginInfo> GetLoginLastUpdatedAndStreakNumber(string email)
+    {
+        UserLoginInfo userLoginInfo = null;
+        DocumentReference docRef = db.Collection("user").Document(email);
+        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+        if (snapshot.Exists)
+        {
+            DateTime lastUpdated = snapshot.GetValue<DateTime>("lastUpdated");
+            int streakNumber = snapshot.GetValue<int>("streak");  
+            bool isClaimed = snapshot.GetValue<bool>("isClaimed");
+
+            userLoginInfo = new UserLoginInfo(lastUpdated, streakNumber, isClaimed);
+        }
+        else
+        {
+            Debug.LogWarning("Error reading coins field from user " + email);
+        }
+
+        return userLoginInfo;
+    }
+
     public async Task<FileInfo> GetFileInfo(string fileId)
     {
         FileInfo fileInfo = null;
