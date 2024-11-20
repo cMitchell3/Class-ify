@@ -22,7 +22,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
         {
             interactionButton = Instantiate(interactionButtonPrefab, canvas.transform);
             //interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
-            interactionButton.GetComponent<Button>().onClick.AddListener(ShowThumbsUpIcon);
+            interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
 
         }
         else
@@ -39,6 +39,15 @@ public class PlayerInteractionManager : MonoBehaviourPun
         else
         {
             Debug.LogError("ThumbsUpIconPrefab not assigned.");
+        }
+
+        if (photonView != null)
+            {
+               Debug.Log("PhotonView found on this GameObject!!!!!!!!");
+            }
+            else
+            {
+               Debug.LogError("PhotonView is missing on this GameObject!");
         }
     }
 
