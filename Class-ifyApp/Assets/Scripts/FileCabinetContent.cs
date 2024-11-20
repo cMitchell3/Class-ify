@@ -53,9 +53,12 @@ public class FileCabinetContent : MonoBehaviour
 
     private async void OnFilesChanged(List<string> outputFileIds)
     {
+        Debug.Log("Files changed");
+
         var fileIdsToRemove = currentFileIds.Except(outputFileIds).ToList();
         foreach (var fileId in fileIdsToRemove)
         {
+            Debug.Log("Remove file: " + fileId);
             if (fileItemInstances.TryGetValue(fileId, out GameObject fileInstance))
             {
                 Destroy(fileInstance);
@@ -66,6 +69,7 @@ public class FileCabinetContent : MonoBehaviour
         var fileIdsToAdd = outputFileIds.Except(currentFileIds).ToList();
         foreach (var fileId in fileIdsToAdd)
         {
+            Debug.Log("Add file: " + fileId);
             GameObject newFileItem = Instantiate(filePrefab, fileGroup.transform);
             FileItem fileItemComponent = newFileItem.GetComponent<FileItem>();
 

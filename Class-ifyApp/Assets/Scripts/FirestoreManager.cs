@@ -74,7 +74,7 @@ public class FirestoreManager : MonoBehaviour
         Debug.Log($"Currency updated in Firestore: {updateCoins} coins for {email}");
     }
 
-    public void UploadFileToFirestore(string filePath, string roomCode)
+    public async Task UploadFileToFirestore(string filePath, string roomCode)
     {
         string fileId = Guid.NewGuid().ToString();
         string fileName = Path.GetFileNameWithoutExtension(filePath);
@@ -91,19 +91,18 @@ public class FirestoreManager : MonoBehaviour
                 { "Extension", extension },
             };
 
-        docRef.SetAsync(fileData).ContinueWith(task =>
+        try
         {
-            if (task.IsCompleted)
-            {
-                Debug.Log("File uploaded successfully with ID: " + fileId);
-            }
-            else
-            {
-                Debug.LogError("Error uploading file, file is likely too large: " + task.Exception);
-            }
-        });
+            await docRef.SetAsync(fileData);
 
-        AddFileReferenceToRoom(fileId, roomCode);
+            Debug.Log("File uploaded successfully with ID: " + fileId);
+            
+            AddFileReferenceToRoom(fileId, roomCode);
+        }
+        catch (Exception e)
+        {
+            throw;
+        }
     }
 
     private void AddFileReferenceToRoom(string fileId, string roomCode)
