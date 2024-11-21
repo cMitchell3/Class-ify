@@ -51,7 +51,7 @@ public class ImportFile : MonoBehaviour
                 errorMessage.color = errorRed;
                 errorMessage.text = "";
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 errorMessage.color = errorRed;
                 errorMessage.text = "Error uploading file, is your file too large (>1MB)?";

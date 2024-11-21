@@ -118,7 +118,7 @@ public class FirestoreManager : MonoBehaviour
             
             AddFileReferenceToRoom(fileId, roomCode);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             throw;
         }
