@@ -9,7 +9,7 @@ public class LoginRewardsController : MonoBehaviour
     public Transform rewardsParent;
     public Button closeButton;
 
-    private UserLoginInfo userLoginInfo;
+    private UserLoginRewardInfo userLoginRewardInfo;
     private string userEmail;
 
     private Dictionary<int, string> rewardDictionary = new Dictionary<int, string>
@@ -23,7 +23,12 @@ public class LoginRewardsController : MonoBehaviour
         {7, "cowboy hat"},
     };
 
-    void Start()
+    private Color white;
+    private Color imageGray;
+    private Color textGray;
+    private Color claimedButtonColor;
+
+    async void Start()
     {
         if (rewardsParent == null)
         {
@@ -36,15 +41,55 @@ public class LoginRewardsController : MonoBehaviour
             closeButton.onClick.AddListener(OnCloseButtonClicked);
         }
 
+        this.white = Color.white;
+
+        Color color;
+        ColorUtility.TryParseHtmlString("#403333", out color);
+        this.imageGray = color;
+        ColorUtility.TryParseHtmlString("#505050", out color);
+        this.textGray = color;
+        ColorUtility.TryParseHtmlString("#848484", out color);
+        this.claimedButtonColor = color;
+
         userEmail = FirebaseAuthManager.Instance.GetUserEmail();
 
-        //TODO Get current datetime now
-        GetLastUpdatedAndDayStreak();
-        //TODO compare last updated with now
-            //if is today or later, do nothing
-            //if was yesterday, update streak value by 1 and update last updated, set is claimed false 
-            //if was before yesterday, set streak value to 1 and update last updated, set is claimed false
-        //TODO update db
+        DateTime now = DateTime.Now;
+
+        this.userLoginRewardInfo =  await FirestoreManager.Instance.GetLoginRewardInfo(userEmail);
+        if (userLoginRewardInfo == null)
+        {
+            userLoginRewardInfo = new UserLoginRewardInfo(now, 1, false);
+            FirestoreManager.Instance.UpdateUserLoginRewardInfo(userEmail, userLoginRewardInfo);
+        }
+        else
+        {
+            DateTime lastUpdated = userLoginRewardInfo.GetLastUpdated();
+            DateTime yesterday = now.AddDays(-1);
+
+            Debug.Log("lastUpdated: " + lastUpdated);
+            Debug.Log("yesterday: " + yesterday);
+
+            if (lastUpdated.Date == yesterday.Date)
+            {
+                int streakNumber = userLoginRewardInfo.GetStreakNumber();
+                if (streakNumber == 7)
+                {
+                    streakNumber = 1;
+                }
+                else
+                {
+                    streakNumber++;
+                }
+                userLoginRewardInfo.SetAll(now, streakNumber, false);
+                FirestoreManager.Instance.UpdateUserLoginRewardInfo(userEmail, userLoginRewardInfo);
+            }
+            else if (lastUpdated.Date <= yesterday.Date)
+            {
+                userLoginRewardInfo.SetAll(now, 1, false);
+                FirestoreManager.Instance.UpdateUserLoginRewardInfo(userEmail, userLoginRewardInfo);
+            }
+        }
+        
         UpdateRewards();
     }
 
@@ -56,37 +101,48 @@ public class LoginRewardsController : MonoBehaviour
     private void UpdateRewards()
     {
         int totalChildren = rewardsParent.childCount;
-        Debug.Log(rewardsParent.name);
 
         for (int i = 0; i < totalChildren; i++)
         {
             GameObject child = rewardsParent.GetChild(i).gameObject;
-            TextMeshProUGUI rewardText = child.GetComponentInChildren<TextMeshProUGUI>(true);
+            
             Button claimButton = child.GetComponentInChildren<Button>(true);
+            TextMeshProUGUI rewardText = child.GetComponentInChildren<TextMeshProUGUI>(true);
             Image rewardImage = child.GetComponent<Image>();
+
+            bool isClaimed = userLoginRewardInfo.GetIsClaimed();
 
             if (claimButton != null && rewardImage != null)
             {
-                claimButton.onClick.AddListener(OnClaimButtonClicked);
+                TextMeshProUGUI claimButtonText = claimButton.GetComponentInChildren<TextMeshProUGUI>();
+                Image claimButtonImage = claimButton.GetComponent<Image>();
+                claimButton.onClick.AddListener(() => OnClaimButtonClicked(claimButtonText, claimButtonImage, rewardText, rewardImage));
 
-                ColorUtility.TryParseHtmlString("#FFFFFF", out Color white);
-                ColorUtility.TryParseHtmlString("#403333", out Color imageGray);
-                ColorUtility.TryParseHtmlString("#505050", out Color textGray);
+                int currentStreakDay = userLoginRewardInfo.GetStreakNumber();
 
-                int currentStreakDay = userLoginInfo.GetStreakNumber();
-
-                if (i + 1 == currentStreakDay)
+                if (i + 1 == currentStreakDay) //current reward available
                 {
                     claimButton.gameObject.SetActive(true);
-                    rewardImage.color = white;
-                    rewardText.color = white;
+                    
+                    if (isClaimed)
+                    {
+                        claimButtonText.text = "Claimed";
+                        claimButtonImage.color = claimedButtonColor;
+                        rewardImage.color = imageGray;
+                        rewardText.color = textGray;
+                    }
+                    else
+                    {
+                        rewardImage.color = white;
+                        rewardText.color = white;
+                    }
                 }
-                else if (i + 1 < currentStreakDay)
+                else if (i + 1 < currentStreakDay) //rewards already passed/claimed
                 {
                     rewardImage.color = imageGray;
                     rewardText.color = textGray;
                 }
-                else
+                else //rewards not available yet
                 {
                     claimButton.gameObject.SetActive(false);
                     rewardImage.color = white;
@@ -96,36 +152,50 @@ public class LoginRewardsController : MonoBehaviour
         }
     }
 
-    private void OnClaimButtonClicked()
+    private void OnClaimButtonClicked(TextMeshProUGUI claimButtonText, Image claimButtonImage, TextMeshProUGUI rewardText, Image rewardImage)
     {
-        //TODO update isclaimed in db
-        int streakNumber = this.userLoginInfo.GetStreakNumber();
+        userLoginRewardInfo.SetLastUpdated(DateTime.Now);
+        userLoginRewardInfo.SetIsClaimed(true);
+        FirestoreManager.Instance.UpdateUserLoginRewardInfo(userEmail, userLoginRewardInfo);
+
+        claimButtonText.text = "Claimed";
+        claimButtonImage.color = claimedButtonColor;
+        rewardImage.color = imageGray;
+        rewardText.color = textGray;
+
+        int streakNumber = this.userLoginRewardInfo.GetStreakNumber();
         string reward = "";
         this.rewardDictionary.TryGetValue(streakNumber, out reward);
-        if (reward.Equals("cowboy"))
+
+        if (int.TryParse(reward, out int coins))
         {
-            //TODO give cowboy hat
+            FirestoreManager.Instance.UpdateUserCurrency(userEmail, coins);
         }
         else
         {
-            int coins = Int32.Parse(reward);
-            FirestoreManager.Instance.UpdateUserCurrency(userEmail, coins);
+            GiveUserCosmeticReward(reward);
         }
     }
 
-    private async void GetLastUpdatedAndDayStreak()
+    private void GiveUserCosmeticReward(string cosmetic)
     {
-        this.userLoginInfo = await FirestoreManager.Instance.GetLoginLastUpdatedAndStreakNumber(userEmail);
+        int cosmeticId = 0;
+        if (cosmetic.Equals("cowboy hat"))
+        {
+            cosmeticId = 1;
+        }
+        
+        FirestoreManager.Instance.UpdateUserInventory(userEmail, cosmeticId);
     }
 }
 
-public class UserLoginInfo
+public class UserLoginRewardInfo
 {
     private DateTime lastUpdated;
     private int streakNumber;
     private bool isClaimed;
 
-    public UserLoginInfo(DateTime lastUpdated, int streakNumber, bool isClaimed)
+    public UserLoginRewardInfo(DateTime lastUpdated, int streakNumber, bool isClaimed)
     {
         this.lastUpdated = lastUpdated;
         this.streakNumber = streakNumber;
@@ -145,5 +215,27 @@ public class UserLoginInfo
     public bool GetIsClaimed()
     {
         return this.isClaimed;
+    }
+
+    public void SetAll(DateTime lastUpdated, int streakNumber, bool isClaimed)
+    {
+        this.lastUpdated = lastUpdated;
+        this.streakNumber = streakNumber;
+        this.isClaimed = isClaimed;
+    }
+
+    public void SetLastUpdated(DateTime lastUpdated)
+    {
+        this.lastUpdated = lastUpdated;
+    }
+
+    public void SetStreakNumber(int streakNumber)
+    {
+        this.streakNumber = streakNumber;
+    }
+
+    public void SetIsClaimed(bool isClaimed)
+    {
+        this.isClaimed = isClaimed;
     }
 }

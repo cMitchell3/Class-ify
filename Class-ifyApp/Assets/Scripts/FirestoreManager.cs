@@ -59,6 +59,25 @@ public class FirestoreManager : MonoBehaviour
         return hostEmail;
     }
 
+    public async void UpdateUserLoginRewardInfo(string email, UserLoginRewardInfo userLoginRewardInfo)
+    {
+        DocumentReference docRef = db.Collection("user").Document(email);
+
+        DateTime lastUpdated = userLoginRewardInfo.GetLastUpdated();
+        int streakNumber = userLoginRewardInfo.GetStreakNumber();
+        bool isClaimed = userLoginRewardInfo.GetIsClaimed();
+
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "lastUpdated", lastUpdated },
+            { "streakNumber", streakNumber },
+            { "isClaimed", isClaimed },
+        };
+
+        await docRef.UpdateAsync(updates);
+        Debug.Log($"User login rewards updated in Firestore: lastUpdated:{lastUpdated} streakNumber:{streakNumber} isClaimed:{isClaimed}");
+    }
+
     public async void UpdateUserCurrency(string email, int amount)
     {
         DocumentReference docRef = db.Collection("user").Document(email);
@@ -221,26 +240,26 @@ public class FirestoreManager : MonoBehaviour
         return coins;
     }
 
-    public async Task<UserLoginInfo> GetLoginLastUpdatedAndStreakNumber(string email)
+    public async Task<UserLoginRewardInfo> GetLoginRewardInfo(string email)
     {
-        UserLoginInfo userLoginInfo = null;
+        UserLoginRewardInfo userLoginRewardInfo = null;
         DocumentReference docRef = db.Collection("user").Document(email);
         DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
         if (snapshot.Exists)
         {
-            DateTime lastUpdated = snapshot.GetValue<DateTime>("lastUpdated");
-            int streakNumber = snapshot.GetValue<int>("streak");  
+            DateTime lastUpdated = snapshot.GetValue<DateTime>("lastUpdated").ToLocalTime();
+            int streakNumber = snapshot.GetValue<int>("streakNumber");  
             bool isClaimed = snapshot.GetValue<bool>("isClaimed");
 
-            userLoginInfo = new UserLoginInfo(lastUpdated, streakNumber, isClaimed);
+            userLoginRewardInfo = new UserLoginRewardInfo(lastUpdated, streakNumber, isClaimed);
         }
         else
         {
             Debug.LogWarning("Error reading coins field from user " + email);
         }
 
-        return userLoginInfo;
+        return userLoginRewardInfo;
     }
 
     public async Task<FileInfo> GetFileInfo(string fileId)
@@ -265,5 +284,63 @@ public class FirestoreManager : MonoBehaviour
         }
 
         return fileInfo;
+    }
+
+    public async void UpdateUserInventory(string email, int cosmeticId)
+    {
+        string[] inventoryItems = await GetUserInventory(email);
+        string[] updatedItems = new string[inventoryItems.Length + 1];
+
+        string cosmeticIdStr = cosmeticId.ToString();
+
+        for (int i = 0; i < updatedItems.Length; i++)
+        {
+            if (updatedItems[i] == cosmeticIdStr) //user already has this cosmetic
+            {
+                Debug.LogWarning("User already has this cosmetic.");
+                return;
+            }
+
+            if (i < inventoryItems.Length)
+            {
+                updatedItems[i] = inventoryItems[i];
+            }
+            else
+            {
+                updatedItems[i] = cosmeticIdStr;
+            }
+        }
+
+        string inventoryContent = string.Join(",", updatedItems);
+
+        DocumentReference docRef = db.Collection("user").Document(email);
+
+        Dictionary<string, object> updates = new Dictionary<string, object>
+        {
+            { "inventory", inventoryContent }
+        };
+
+        await docRef.UpdateAsync(updates);
+        Debug.Log($"Inventory updated in Firestore for {email}.");
+    }
+
+    public async Task<string[]> GetUserInventory(string email)
+    {
+        string[] inventoryItems = new string[0];
+
+        DocumentReference docRef = db.Collection("user").Document(email);
+        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+
+        if (snapshot.Exists && snapshot.ContainsField("inventory"))
+        {
+            string inventoryContent = snapshot.GetValue<string>("inventory");
+            inventoryItems = inventoryContent.Split(',');
+        }
+        else
+        {
+            Debug.LogWarning("No inventory field found for user.");
+        }
+
+        return inventoryItems;
     }
 }
