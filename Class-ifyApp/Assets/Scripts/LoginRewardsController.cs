@@ -66,9 +66,6 @@ public class LoginRewardsController : MonoBehaviour
             DateTime lastUpdated = userLoginRewardInfo.GetLastUpdated();
             DateTime yesterday = now.AddDays(-1);
 
-            Debug.Log("lastUpdated: " + lastUpdated);
-            Debug.Log("yesterday: " + yesterday);
-
             if (lastUpdated.Date == yesterday.Date)
             {
                 int streakNumber = userLoginRewardInfo.GetStreakNumber();
