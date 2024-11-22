@@ -55,7 +55,7 @@ public class LoginRewardsController : MonoBehaviour
 
         DateTime now = DateTime.Now;
 
-        this.userLoginRewardInfo =  await FirestoreManager.Instance.GetLoginRewardInfo(userEmail);
+        this.userLoginRewardInfo = await FirestoreManager.Instance.GetLoginRewardInfo(userEmail);
         if (userLoginRewardInfo == null)
         {
             userLoginRewardInfo = new UserLoginRewardInfo(now, 1, false);
@@ -113,7 +113,7 @@ public class LoginRewardsController : MonoBehaviour
             {
                 TextMeshProUGUI claimButtonText = claimButton.GetComponentInChildren<TextMeshProUGUI>();
                 Image claimButtonImage = claimButton.GetComponent<Image>();
-                claimButton.onClick.AddListener(() => OnClaimButtonClicked(claimButtonText, claimButtonImage, rewardText, rewardImage));
+                claimButton.onClick.AddListener(() => OnClaimButtonClicked(claimButton, claimButtonText, claimButtonImage, rewardText, rewardImage));
 
                 int currentStreakDay = userLoginRewardInfo.GetStreakNumber();
 
@@ -123,6 +123,7 @@ public class LoginRewardsController : MonoBehaviour
                     
                     if (isClaimed)
                     {
+                        claimButton.interactable = false;
                         claimButtonText.text = "Claimed";
                         claimButtonImage.color = claimedButtonColor;
                         rewardImage.color = imageGray;
@@ -149,12 +150,13 @@ public class LoginRewardsController : MonoBehaviour
         }
     }
 
-    private void OnClaimButtonClicked(TextMeshProUGUI claimButtonText, Image claimButtonImage, TextMeshProUGUI rewardText, Image rewardImage)
+    private void OnClaimButtonClicked(Button claimButton, TextMeshProUGUI claimButtonText, Image claimButtonImage, TextMeshProUGUI rewardText, Image rewardImage)
     {
         userLoginRewardInfo.SetLastUpdated(DateTime.Now);
         userLoginRewardInfo.SetIsClaimed(true);
         FirestoreManager.Instance.UpdateUserLoginRewardInfo(userEmail, userLoginRewardInfo);
 
+        claimButton.interactable = false;
         claimButtonText.text = "Claimed";
         claimButtonImage.color = claimedButtonColor;
         rewardImage.color = imageGray;
