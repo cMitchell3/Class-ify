@@ -13,17 +13,31 @@ public class InventoryLogic : MonoBehaviour
     private Button topHatButton;
     private Button bucketHatButton;
     private Button cowHatButton;
+    private Button treeButton;
+    private Button paintingButton;
 
     private Image topHatBackground;
     private Image bucketHatBackground;
     private Image cowHatBackground;
+    private Image treeBackground;
+    private Image paintingBackground;
+
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject inventoryMenu;
 
 
     void Start()
     {
         cosmeticLogic = GameObject.FindGameObjectWithTag("CosmeticLogic").GetComponent<CosmeticLogic>();
 
-        StartCoroutine(SetupButtons());
+        if (SceneManager.GetActiveScene().name == "InventoryMenu")
+        {
+            StartCoroutine(SetupButtons());
+        }
+        if (SceneManager.GetActiveScene().name == "RoomScene")
+        {
+            StartCoroutine(SetupDecorButtons());
+        }
     }
 
     private IEnumerator SetupButtons()
@@ -57,9 +71,45 @@ public class InventoryLogic : MonoBehaviour
         }
     }
 
+    private IEnumerator SetupDecorButtons()
+    {
+        // Wait until the buttons exist
+        yield return new WaitUntil(() => GameObject.Find("pixelTree") != null);
+
+        treeButton = GameObject.Find("pixelTree").GetComponent<Button>();
+        paintingButton = GameObject.Find("pixelWallPainting").GetComponent<Button>();
+
+        treeButton.onClick.AddListener(EquipTree);
+        paintingButton.onClick.AddListener(EquipPainting);
+
+        treeBackground = treeButton.GetComponent<Image>();
+        paintingBackground = paintingButton.GetComponent<Image>();
+
+        if (cosmeticLogic.treeEquipped)
+        {
+            treeBackground.color = Color.green;
+        }
+        if (cosmeticLogic.paintingEquipped)
+        {
+            paintingBackground.color = Color.green;
+        }
+    }
+
     public void BackButton()
     {
         SceneManager.LoadScene("MainMenuScene");
+    }
+
+    public void BackToPauseMenu()
+    {
+        inventoryMenu.SetActive(false);
+        pauseMenu.SetActive(true);
+    }
+
+    public void InventoryButton()
+    {
+        inventoryMenu.SetActive(true);
+        pauseMenu.SetActive(false);
     }
 
     public void PlayerCosmeticsButton()
@@ -128,10 +178,14 @@ public class InventoryLogic : MonoBehaviour
     public void EquipTree()
     {
         cosmeticLogic.treeEquipped = true;
+
+        treeBackground.color = Color.green;
     }
 
     public void EquipPainting()
     {
         cosmeticLogic.paintingEquipped = true;
+
+        paintingBackground.color = Color.green;
     }
 }

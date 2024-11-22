@@ -9,6 +9,9 @@ TagManager:
   - VoiceManager
   - Wall
   - CosmeticLogic
+  - Painting
+  - Tree
+  - FileCabinet
   layers:
   - Default
   - TransparentFX

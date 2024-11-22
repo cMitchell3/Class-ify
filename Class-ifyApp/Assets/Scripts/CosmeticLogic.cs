@@ -1,3 +1,5 @@
+using System.Collections;
+using ExitGames.Client.Photon.StructWrapping;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,6 +20,7 @@ public class CosmeticLogic : MonoBehaviour
     private GameObject painting;
 
     private GameObject player;
+    private GameObject fileCabinet;
 
 
     // Ensure only one instance of this object at all times
@@ -39,9 +42,10 @@ public class CosmeticLogic : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "RoomScene")
         {
             FindPlayer();
+            FindFileCabinetCanvas();
             LoadCosmetics();
-            //LoadRoomDecor();
-            //EquipDecor();
+            LoadRoomDecor();
+            EquipDecor();
             EquipCosmetics();
         }
     }
@@ -54,6 +58,16 @@ public class CosmeticLogic : MonoBehaviour
         }
 
         player = GameObject.FindGameObjectWithTag("Player");
+    }
+
+    private void FindFileCabinetCanvas()
+    {
+        if (fileCabinet != null)
+        {
+            return;
+        }
+
+        fileCabinet = GameObject.FindGameObjectWithTag("FileCabinet");
     }
 
     private void LoadCosmetics()
@@ -94,8 +108,8 @@ public class CosmeticLogic : MonoBehaviour
             return;
         }
 
-        tree = GameObject.FindGameObjectWithTag("Tree");
-        painting = GameObject.FindGameObjectWithTag("Painting");
+        tree = fileCabinet.transform.GetChild(1).gameObject;
+        painting = fileCabinet.transform.GetChild(2).gameObject;
     }
 
     private void EquipDecor()
