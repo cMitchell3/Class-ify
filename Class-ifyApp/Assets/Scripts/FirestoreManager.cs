@@ -247,11 +247,17 @@ public class FirestoreManager : MonoBehaviour
 
         if (snapshot.Exists)
         {
-            DateTime lastUpdated = snapshot.GetValue<DateTime>("lastUpdated").ToLocalTime();
-            int streakNumber = snapshot.GetValue<int>("streakNumber");  
-            bool isClaimed = snapshot.GetValue<bool>("isClaimed");
-
-            userLoginRewardInfo = new UserLoginRewardInfo(lastUpdated, streakNumber, isClaimed);
+            try
+            {
+                DateTime lastUpdated = snapshot.GetValue<DateTime>("lastUpdated").ToLocalTime();
+                int streakNumber = snapshot.GetValue<int>("streakNumber");  
+                bool isClaimed = snapshot.GetValue<bool>("isClaimed");
+                userLoginRewardInfo = new UserLoginRewardInfo(lastUpdated, streakNumber, isClaimed);
+            }
+            catch (Exception)
+            {
+                userLoginRewardInfo = null;
+            }
         }
         else
         {
