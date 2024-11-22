@@ -35,15 +35,17 @@ namespace Com.CS.Classify
         private FirebaseFirestore db;
         private FirebaseAuth auth;
         private FirebaseUser user;
+        public WhiteboardDrawing whiteboardDrawing;
 
         #endregion
 
         #region Public Methods
 
         // Player leaves room
-        public void LeaveRoom()
+        public async void LeaveRoom()
         {
             Debug.Log("Leaving room");
+            await HandleHostCheckWhiteboard();
             PhotonNetwork.LeaveRoom();
 
             RemoveUserFromArray();
@@ -58,16 +60,16 @@ namespace Com.CS.Classify
             DocumentReference roomRef = db.Collection("room").Document(roomCode);
 
             // Use ArrayRemove to remove the user email from the users array
-            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayRemove(user.Email))
+            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayRemove(PhotonNetwork.NickName))
                 .ContinueWithOnMainThread(task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.Log($"User {user.Email} removed from room {roomCode}.");
+                        Debug.Log($"User {PhotonNetwork.NickName} removed from room {roomCode}.");
                     }
                     else
                     {
-                        Debug.LogError($"Error removing user {user.Email} from room {roomCode}: {task.Exception}");
+                        Debug.LogError($"Error removing user {PhotonNetwork.NickName} from room {roomCode}: {task.Exception}");
                     }
                 });
         }
@@ -145,7 +147,7 @@ namespace Com.CS.Classify
             yield return new WaitUntil(() => hostUsernameTask.IsCompleted);
             string hostUsername = hostUsernameTask.Result;
 
-            bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
+            // bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
             //bool isCurrentPlayerHost = "gongoozler" == hostUsername;
             // Debug.Log($"Player found with username: {PhotonNetwork.NickName}.");
             // Debug.Log($"Host found with username: {hostUsername}.");
@@ -156,11 +158,36 @@ namespace Com.CS.Classify
             //bool isCurrentPlayerHost = String.Equals("gongoozler", hostUsername);
 
             // Call PopulateKickMenu with the host info
-            StartCoroutine(PopulateKickMenu(isCurrentPlayerHost));
+            StartCoroutine(PopulateKickMenu(hostUsername));
         }
 
-        IEnumerator PopulateKickMenu(bool isCurrentPlayerHost)
+        public async Task<bool> FetchHost()
         {
+            try
+            {
+                // Fetch room data
+                DocumentSnapshot fetchHostResult = await GetRoomDataAsync();
+                if (fetchHostResult == null)
+                {
+                    Debug.LogError("Failed to retrieve room data.");
+                    return false;
+                }
+
+                // Get the host name
+                string hostUsername = await FetchHostUsernameAsync();
+                bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
+                return isCurrentPlayerHost;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("Error fetching host: " + ex.Message);
+                return false;
+            }
+        }
+
+        IEnumerator PopulateKickMenu(string hostUsername)
+        {
+            bool isCurrentPlayerHost = PhotonNetwork.NickName == hostUsername;
             // Toggle KickMenu visibility
             kickMenu.gameObject.SetActive(!kickMenu.gameObject.activeSelf);
 
@@ -191,6 +218,12 @@ namespace Com.CS.Classify
                 // Assign player name to PlayerName text field
                 TextMeshProUGUI playerNameText = newElement.transform.Find("PlayerName").GetComponent<TextMeshProUGUI>();
                 playerNameText.text = playerName;
+
+                if (playerNameText.text.Equals(hostUsername))
+                {
+                    Image hostStar = newElement.transform.Find("HostStar").GetComponent<Image>();
+                    hostStar.gameObject.SetActive(true);
+                }
 
                 // Set up KickButton functionality
                 Button kickButton = newElement.transform.Find("KickButton").GetComponent<Button>();
@@ -360,6 +393,7 @@ namespace Com.CS.Classify
         public override void OnPlayerLeftRoom(Player other)
         {
             string username = other.NickName;
+
             Debug.LogFormat("OnPlayerLeftRoom() {0}", username);
             FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(username);
 
@@ -368,6 +402,20 @@ namespace Com.CS.Classify
                 Debug.LogFormat("OnPlayerLeftRoom IsMasterClient {0}", PhotonNetwork.IsMasterClient);
             }
         }
+
+        private async Task HandleHostCheckWhiteboard()
+        {
+            //Unlocks whiteboard if still locked
+            bool isHost = await FetchHost();
+            if (isHost)
+            {
+                if (whiteboardDrawing != null && whiteboardDrawing.IsLocked)
+                {
+                    Debug.Log("Unlocking whiteboard since host left");
+                    whiteboardDrawing.ToggleLock();
+                } 
+            }
+        }      
 
         #endregion
     }

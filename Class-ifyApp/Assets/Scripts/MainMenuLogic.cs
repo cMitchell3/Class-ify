@@ -2,19 +2,19 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MainMenuLogic : MonoBehaviour
 {
-    // Start is called before the first frame update
+    public Button openLoginRewardsButton;
+    public GameObject loginRewardsPanel;
+
     void Start()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        if (openLoginRewardsButton != null)
+        {
+            openLoginRewardsButton.onClick.AddListener(OnOpenLoginRewardsButtonClicked);
+        }
     }
 
     public void SettingsButton()
@@ -29,5 +29,10 @@ public class MainMenuLogic : MonoBehaviour
 
     public void CharacterButton() {
         SceneManager.LoadScene("InventoryMenu");
+    }
+
+    private void OnOpenLoginRewardsButtonClicked()
+    {
+        loginRewardsPanel.SetActive(true);
     }
 }
