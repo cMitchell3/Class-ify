@@ -75,6 +75,7 @@ public class InventoryDisplayController : MonoBehaviour
                 if (imageComponent != null)
                 {
                     itemImage.sprite = itemSprite;
+                    inventoryElement.name = itemSprite.name;
                 }
             }
             else

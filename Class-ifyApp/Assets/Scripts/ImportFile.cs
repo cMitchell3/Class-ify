@@ -4,13 +4,16 @@ using UnityEngine;
 using SFB;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class ImportFile : MonoBehaviour
 {
     public Button importButton;
+    public TextMeshProUGUI errorMessage;
     public TextMeshProUGUI roomCodeDisplay;
     private string userEmail;
     private static int importCoins = 10;
+    private Color errorRed;
 
     void Start()
     {
@@ -22,19 +25,37 @@ public class ImportFile : MonoBehaviour
         if (importButton != null)
         {
             importButton.onClick.AddListener(OnImportButtonClicked);
-        }
+        }   
+
+        Color color;
+        ColorUtility.TryParseHtmlString("#C70D0D", out color);
+        this.errorRed = color;
 
         userEmail = FirebaseAuthManager.Instance.GetUserEmail();
     }
 
-    public void OnImportButtonClicked()
+    public async void OnImportButtonClicked()
     {
+        errorMessage.text = "";
+        
         string filePath = OpenFileDialog();
         if (!filePath.Equals(""))
         {
             string roomCode = roomCodeDisplay.text.Split(" ")[2];
-            FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
-            FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
+            try
+            {
+                errorMessage.color = Color.white;
+                errorMessage.text = "Uploading...";
+                await FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
+                FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
+                errorMessage.color = errorRed;
+                errorMessage.text = "";
+            }
+            catch (Exception)
+            {
+                errorMessage.color = errorRed;
+                errorMessage.text = "Error uploading file, is your file too large (>1MB)?";
+            }
         }
     }
 

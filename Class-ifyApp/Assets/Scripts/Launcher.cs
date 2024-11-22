@@ -16,6 +16,7 @@ using TMPro;
 using Firebase.Auth;
 using Firebase.Firestore;
 using Firebase.Extensions;
+using ExitGames.Client.Photon.StructWrapping;
 
 namespace Com.CS.Classify
 {
@@ -112,16 +113,16 @@ namespace Com.CS.Classify
             DocumentReference roomRef = db.Collection("room").Document(roomCode);
 
             // Use ArrayUnion to add the user email to the users array
-            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayUnion(user.Email))
+            roomRef.UpdateAsync("ActiveUsers", FieldValue.ArrayUnion(PhotonNetwork.NickName))
                 .ContinueWithOnMainThread(task =>
                 {
                     if (task.IsCompletedSuccessfully)
                     {
-                        Debug.Log($"User {user.Email} added to room {roomCode}.");
+                        Debug.Log($"User {PhotonNetwork.NickName} added to room {roomCode}.");
                     }
                     else
                     {
-                        Debug.LogError($"Error adding user {user.Email} to room {roomCode}: {task.Exception}");
+                        Debug.LogError($"Error adding user {PhotonNetwork.NickName} to room {roomCode}: {task.Exception}");
                     }
                 });
         }

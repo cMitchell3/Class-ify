@@ -47,6 +47,7 @@ MonoBehaviour:
   - GetMessage
   - ClearWhiteboardRPC
   - ReceiveDrawLine
+  - UpdateLockState
   - ShowThumbsUpIcon
   - AddCoinsToClickedPlayer
   - RewardCoins
