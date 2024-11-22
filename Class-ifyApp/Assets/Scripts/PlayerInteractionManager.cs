@@ -4,17 +4,17 @@ using Photon.Pun;
 
 public class PlayerInteractionManager : MonoBehaviourPun
 {
-    public GameObject interactionButtonPrefab; // Prefab for the button
-    public GameObject thumbsUpIconPrefab;      // Prefab for thumbs-up icon
+    public GameObject interactionButtonPrefab; 
+    public GameObject thumbsUpIconPrefab;      
     public Vector3 screenOffset = new Vector3(0f, 2f, 0f); // Offset for UI above players
 
-    private Transform playerTransform;       // Reference to this player's transform
-    private GameObject interactionButton;   // Instance of the interaction button
-    private GameObject thumbsUpIconInstance; // Instance of the thumbs-up icon
-    private PhotonView targetPhotonView;     // Store the target PhotonView for confirmation
-    private GameObject thumbsUpUI;             // Reference to the confirmation UI canvas
-    private Button noThumbsUpButton;           // Reference to the "No" button
-    private Button thumbsUpYesButton;          // Reference to the "Yes" button
+    private Transform playerTransform;       
+    private GameObject interactionButton;   
+    private GameObject thumbsUpIconInstance;
+//    private PhotonView targetPhotonView;
+    private GameObject thumbsUpUI;             
+    private Button noThumbsUpButton;           
+    private Button thumbsUpYesButton;          
 
 
     void Start()
@@ -33,7 +33,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
 
         if (thumbsUpUI != null)
         {
-            thumbsUpUI.SetActive(false); // Initially hide the confirmation UI
+            thumbsUpUI.SetActive(false); 
 
             noThumbsUpButton = thumbsUpUI.transform.Find("NoThumbsUpButton")?.GetComponent<Button>();
             thumbsUpYesButton = thumbsUpUI.transform.Find("ThumbsUpYesButton")?.GetComponent<Button>();
@@ -47,21 +47,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
                 {
                     thumbsUpYesButton.onClick.AddListener(OnThumbsUpYesButtonClicked);
                 }
-            else
-            {
-                Debug.LogError("ThumbsUpYesButton not found in ThumbsUpUI.");
             }
-            }
-            else
-            {
-                Debug.LogError("NoThumbsUpButton not found in ThumbsUpUI.");
-            }
-
-            
-        }
-        else
-        {
-            Debug.LogError("ThumbsUpUI canvas not found within the main Canvas.");
         }
     }
     else
@@ -111,10 +97,6 @@ public class PlayerInteractionManager : MonoBehaviourPun
     {
         Debug.Log($"Interaction button clicked for player: {photonView.Owner.NickName}");
 
-        // Store the PhotonView of the clicked player
-        targetPhotonView = photonView;
-
-        // Activate confirmation UI for the clicking player
         if (thumbsUpUI != null)
         {
             thumbsUpUI.SetActive(true);
@@ -126,7 +108,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
         Debug.Log("Thumbs-up interaction canceled.");
         if (thumbsUpUI != null)
         {
-            thumbsUpUI.SetActive(false); // Hide the confirmation UI
+            thumbsUpUI.SetActive(false); 
         }
     }
 
@@ -136,14 +118,16 @@ public class PlayerInteractionManager : MonoBehaviourPun
 
         if (thumbsUpUI != null)
         {
-            thumbsUpUI.SetActive(false); // Hide the confirmation UI
+            thumbsUpUI.SetActive(false);
         }
 
+//        targetPhotonView = photonView;
+
         // Call RPC to show thumbs-up icon and reward coins
-        if (targetPhotonView != null && PhotonNetwork.IsConnected)
+        if (photonView != null && PhotonNetwork.IsConnected)
         {
-            targetPhotonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
-            targetPhotonView.RPC("RewardCoins", RpcTarget.AllBuffered, photonView.Owner.NickName, 10);
+            photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
+            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, photonView.Owner.NickName, 10);
         }
         else
         {
@@ -162,11 +146,11 @@ public class PlayerInteractionManager : MonoBehaviourPun
 
     private System.Collections.IEnumerator ShowIconTemporarily()
     {
-        thumbsUpIconInstance.SetActive(true); // Activate thumbs-up icon
+        thumbsUpIconInstance.SetActive(true); 
 
-        yield return new WaitForSeconds(2); // Wait for 2 seconds
+        yield return new WaitForSeconds(2); 
 
-        thumbsUpIconInstance.SetActive(false); // Deactivate thumbs-up icon
+        thumbsUpIconInstance.SetActive(false); 
     }
 
     [PunRPC]
@@ -189,9 +173,5 @@ public class PlayerInteractionManager : MonoBehaviourPun
                 Debug.LogWarning("CurrencyDisplayController not found for the local player.");
             }
         }
-//        else
-//        {
-//            Debug.log($"RewardCoins ignored for player: {PhotonNetwork.LocalPlayer.Nickname}");
-//        }  
     }
 }
