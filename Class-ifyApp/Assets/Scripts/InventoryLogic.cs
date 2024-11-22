@@ -18,8 +18,6 @@ public class InventoryLogic : MonoBehaviour
     private Image bucketHatBackground;
     private Image cowHatBackground;
 
-    private string buttonHexColor = "#0D043D";
-
 
     void Start()
     {
