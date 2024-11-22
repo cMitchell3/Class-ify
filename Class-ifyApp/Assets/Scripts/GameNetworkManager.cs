@@ -30,8 +30,8 @@ namespace Com.CS.Classify
         public TMP_InputField testKickPlayerName;
         public TextMeshProUGUI roomCodeDisplay;
         public Transform kickMenu;
-        public GameObject playerListElement; 
-        private RoomNotificationManager roomNotificationManager;
+        public GameObject playerListElement;
+        private Chat textChat;
         private FirebaseFirestore db;
         private FirebaseAuth auth;
         private FirebaseUser user;
@@ -91,8 +91,8 @@ namespace Com.CS.Classify
                 testKickButton.onClick.AddListener(OnTestKickButtonClicked);
             }
 
-            roomNotificationManager = FindObjectOfType<RoomNotificationManager>();
-            if (roomNotificationManager == null)
+            textChat = FindObjectOfType<Chat>();
+            if (textChat == null)
             {
                 Debug.LogError("Error: cannot find room notification manager script.");
             }
@@ -375,7 +375,7 @@ namespace Com.CS.Classify
             // Not seen if you're player joining
             string username = other.NickName;
             Debug.LogFormat("OnPlayerEnteredRoom() " + username);
-            FindObjectOfType<RoomNotificationManager>().ShowPlayerJoined(username);
+            textChat.ShowPlayerJoined(username);
 
             if (PhotonNetwork.IsMasterClient)
             {
@@ -395,7 +395,7 @@ namespace Com.CS.Classify
             string username = other.NickName;
 
             Debug.LogFormat("OnPlayerLeftRoom() {0}", username);
-            FindObjectOfType<RoomNotificationManager>().ShowPlayerLeft(username);
+            textChat.ShowPlayerLeft(username);
 
             if (PhotonNetwork.IsMasterClient)
             {
