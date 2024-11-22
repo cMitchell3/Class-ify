@@ -11,11 +11,10 @@ public class PlayerInteractionManager : MonoBehaviourPun
     private Transform playerTransform;       
     private GameObject interactionButton;   
     private GameObject thumbsUpIconInstance;
-//    private PhotonView targetPhotonView;
     private GameObject thumbsUpUI;             
     private Button noThumbsUpButton;           
-    private Button thumbsUpYesButton;          
-
+    private Button thumbsUpYesButton;
+    private string targetPlayerNickName;
 
     void Start()
 {
@@ -101,6 +100,8 @@ public class PlayerInteractionManager : MonoBehaviourPun
         {
             thumbsUpUI.SetActive(true);
         }
+
+        targetPlayerNickName = photonView.Owner.NickName;
     }
 
     private void OnNoThumbsUpButtonClicked()
@@ -114,20 +115,16 @@ public class PlayerInteractionManager : MonoBehaviourPun
 
     private void OnThumbsUpYesButtonClicked()
     {
-        Debug.Log("Thumbs-up interaction confirmed.");
-
         if (thumbsUpUI != null)
         {
             thumbsUpUI.SetActive(false);
         }
 
-//        targetPhotonView = photonView;
-
         // Call RPC to show thumbs-up icon and reward coins
-        if (photonView != null && PhotonNetwork.IsConnected)
+        if (!string.IsNullOrEmpty(targetPlayerNickName) && PhotonNetwork.IsConnected)
         {
             photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
-            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, photonView.Owner.NickName, 10);
+            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, targetPlayerNickName, 10);
         }
         else
         {
@@ -157,8 +154,9 @@ public class PlayerInteractionManager : MonoBehaviourPun
     public void RewardCoins(string targetUserId, int amount)
     {
         // Find the CurrencyDisplayController in the scene
-        Debug.Log($"Adding coins for player: {photonView.Owner.NickName}");
-        if (PhotonNetwork.NickName == targetUserId)
+        Debug.Log($"Player Name: {PhotonNetwork.NickName}");
+        Debug.Log($"Search Name: {targetUserId}");
+        if (PhotonNetwork.LocalPlayer.NickName == targetUserId)
         {
            // Find the CurrencyDisplayController for the local player
             CurrencyDisplayController currencyController = FindObjectOfType<CurrencyDisplayController>();
