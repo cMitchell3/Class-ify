@@ -205,6 +205,14 @@ public class BuyItemLogic : MonoBehaviour
             {
                 IncreaseButtonOpacity(optionThree.GetComponentInChildren<TextMeshProUGUI>());
             }
+            else if (item == "4")
+            {
+                IncreaseButtonOpacity(optionFour.GetComponentInChildren<TextMeshProUGUI>());
+            }
+            else if (item == "5")
+            {
+                IncreaseButtonOpacity(optionFive.GetComponentInChildren<TextMeshProUGUI>());
+            }
         }
     }
 
