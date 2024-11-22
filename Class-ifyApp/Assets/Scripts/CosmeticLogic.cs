@@ -40,8 +40,8 @@ public class CosmeticLogic : MonoBehaviour
         {
             FindPlayer();
             LoadCosmetics();
-            LoadRoomDecor();
-            EquipDecor();
+            //LoadRoomDecor();
+            //EquipDecor();
             EquipCosmetics();
         }
     }
