@@ -12,9 +12,12 @@ public class InventoryDisplayController : MonoBehaviour
 
     public GameObject inventoryElementPrefab; // Reference to your InventoryElement prefab
     public Transform inventoryGrid; // Reference to your grid layout transform
+    public Transform inventoryDecorGrid; // Reference to the room decor grid layout transform
     public Sprite pixelCowboyHat;
     public Sprite pixelTopHat;
     public Sprite pixelBucketHat;
+    public Sprite pixelWallPainting;
+    public Sprite pixelTree;
 
     private Dictionary<string, Sprite> itemSprites;
 
@@ -30,7 +33,9 @@ public class InventoryDisplayController : MonoBehaviour
         {
             { "1", pixelCowboyHat },
             { "2", pixelTopHat },
-            { "3", pixelBucketHat }
+            { "3", pixelBucketHat }, 
+            { "4", pixelWallPainting },
+            { "5", pixelTree }
         };
 
         LoadInventoryFromDatabase();
@@ -66,16 +71,33 @@ public class InventoryDisplayController : MonoBehaviour
         {
             if (itemSprites.TryGetValue(itemId, out Sprite itemSprite))
             {
-                // Instantiate the InventoryElement prefab
-                GameObject inventoryElement = Instantiate(inventoryElementPrefab, inventoryGrid);
-                Transform imageComponent = inventoryElement.transform.Find("ElementIcon");
-
-                // Find the Image component under the button and set the sprite
-                Image itemImage = imageComponent.GetComponent<Image>();
-                if (imageComponent != null)
+                if (itemId != "4" && itemId != "5")
                 {
-                    itemImage.sprite = itemSprite;
-                    inventoryElement.name = itemSprite.name;
+                    // Instantiate the InventoryElement prefab
+                    GameObject inventoryElement = Instantiate(inventoryElementPrefab, inventoryGrid);
+                    Transform imageComponent = inventoryElement.transform.Find("ElementIcon");
+
+                    // Find the Image component under the button and set the sprite
+                    Image itemImage = imageComponent.GetComponent<Image>();
+                    if (imageComponent != null)
+                    {
+                        itemImage.sprite = itemSprite;
+                        inventoryElement.name = itemSprite.name;
+                    }
+                }
+                else
+                {
+                    // Instantiate the InventoryElement prefab
+                    GameObject inventoryElement = Instantiate(inventoryElementPrefab, inventoryDecorGrid);
+                    Transform imageComponent = inventoryElement.transform.Find("ElementIcon");
+
+                    // Find the Image component under the button and set the sprite
+                    Image itemImage = imageComponent.GetComponent<Image>();
+                    if (imageComponent != null)
+                    {
+                        itemImage.sprite = itemSprite;
+                        inventoryElement.name = itemSprite.name;
+                    }
                 }
             }
             else

@@ -124,4 +124,14 @@ public class InventoryLogic : MonoBehaviour
         bucketHatBackground.color = Color.magenta;
         cowHatBackground.color = Color.magenta;
     }
+
+    public void EquipTree()
+    {
+        cosmeticLogic.treeEquipped = true;
+    }
+
+    public void EquipPainting()
+    {
+        cosmeticLogic.paintingEquipped = true;
+    }
 }

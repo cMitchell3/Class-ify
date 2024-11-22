@@ -8,10 +8,14 @@ public class CosmeticLogic : MonoBehaviour
     [HideInInspector] public bool topHatEquipped = false;
     [HideInInspector] public bool cowHatEquipped = false;
     [HideInInspector] public bool bucketHatEquipped = false;
+    [HideInInspector] public bool treeEquipped = false;
+    [HideInInspector] public bool paintingEquipped = false;
 
     private GameObject topHat;
     private GameObject cowHat;
     private GameObject bucketHat;
+    private GameObject tree;
+    private GameObject painting;
 
     private GameObject player;
 
@@ -36,6 +40,8 @@ public class CosmeticLogic : MonoBehaviour
         {
             FindPlayer();
             LoadCosmetics();
+            LoadRoomDecor();
+            EquipDecor();
             EquipCosmetics();
         }
     }
@@ -72,11 +78,29 @@ public class CosmeticLogic : MonoBehaviour
 
     private void EquipCosmetics()
     {
-        if (topHatEquipped)
-        {
-            topHat.SetActive(true);
-        }
+        topHat.SetActive(topHatEquipped);
         cowHat.SetActive(cowHatEquipped);
         bucketHat.SetActive(bucketHatEquipped);
+    }
+
+    private void LoadRoomDecor()
+    {
+        if (tree != null)
+        {
+            return;
+        }
+        if (painting != null)
+        {
+            return;
+        }
+
+        tree = GameObject.FindGameObjectWithTag("Tree");
+        painting = GameObject.FindGameObjectWithTag("Painting");
+    }
+
+    private void EquipDecor()
+    {
+        tree.SetActive(treeEquipped);
+        painting.SetActive(paintingEquipped);
     }
 }
