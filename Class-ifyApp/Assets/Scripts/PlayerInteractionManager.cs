@@ -11,43 +11,84 @@ public class PlayerInteractionManager : MonoBehaviourPun
     private Transform playerTransform;       // Reference to this player's transform
     private GameObject interactionButton;   // Instance of the interaction button
     private GameObject thumbsUpIconInstance; // Instance of the thumbs-up icon
+    private PhotonView targetPhotonView;     // Store the target PhotonView for confirmation
+    private GameObject thumbsUpUI;             // Reference to the confirmation UI canvas
+    private Button noThumbsUpButton;           // Reference to the "No" button
+    private Button thumbsUpYesButton;          // Reference to the "Yes" button
+
 
     void Start()
+{
+    playerTransform = this.transform;
+
+    // Find and set up the interaction button
+    GameObject canvas = GameObject.Find("Canvas");
+    if (canvas != null && interactionButtonPrefab != null)
     {
-        playerTransform = this.transform;
+        interactionButton = Instantiate(interactionButtonPrefab, canvas.transform);
+        interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
 
-        // Instantiate interaction button
-        GameObject canvas = GameObject.Find("Canvas");
-        if (canvas != null && interactionButtonPrefab != null)
+        // Search for ThumbsUpUI within the same canvas
+        thumbsUpUI = canvas.transform.Find("ThumbsUpUI")?.gameObject;
+
+        if (thumbsUpUI != null)
         {
-            interactionButton = Instantiate(interactionButtonPrefab, canvas.transform);
-            interactionButton.GetComponent<Button>().onClick.AddListener(OnInteractionButtonClicked);
+            thumbsUpUI.SetActive(false); // Initially hide the confirmation UI
+
+            noThumbsUpButton = thumbsUpUI.transform.Find("NoThumbsUpButton")?.GetComponent<Button>();
+            thumbsUpYesButton = thumbsUpUI.transform.Find("ThumbsUpYesButton")?.GetComponent<Button>();
+
+            if (noThumbsUpButton != null)
+            {
+                noThumbsUpButton.onClick.AddListener(OnNoThumbsUpButtonClicked);
+                thumbsUpYesButton = noThumbsUpButton.transform.Find("ThumbsUpYesButton")?.GetComponent<Button>();
+
+                if (thumbsUpYesButton != null)
+                {
+                    thumbsUpYesButton.onClick.AddListener(OnThumbsUpYesButtonClicked);
+                }
+            else
+            {
+                Debug.LogError("ThumbsUpYesButton not found in ThumbsUpUI.");
+            }
+            }
+            else
+            {
+                Debug.LogError("NoThumbsUpButton not found in ThumbsUpUI.");
+            }
+
+            
         }
         else
         {
-            Debug.LogError("Canvas or InteractionButtonPrefab not assigned.");
-        }
-
-        // Instantiate thumbs-up icon
-        if (canvas != null && thumbsUpIconPrefab != null)
-        {
-            thumbsUpIconInstance = Instantiate(thumbsUpIconPrefab, canvas.transform);
-            thumbsUpIconInstance.SetActive(false); // Initially inactive
-        }
-        else
-        {
-            Debug.LogError("ThumbsUpIconPrefab not assigned.");
-        }
-
-        if (photonView != null)
-        {
-            Debug.Log("PhotonView found on this GameObject!");
-        }
-        else
-        {
-            Debug.LogError("PhotonView is missing on this GameObject!");
+            Debug.LogError("ThumbsUpUI canvas not found within the main Canvas.");
         }
     }
+    else
+    {
+        Debug.LogError("Main Canvas or InteractionButtonPrefab not assigned.");
+    }
+
+    // Find and set up the thumbs-up icon
+    if (canvas != null && thumbsUpIconPrefab != null)
+    {
+        thumbsUpIconInstance = Instantiate(thumbsUpIconPrefab, canvas.transform);
+        thumbsUpIconInstance.SetActive(false); // Initially inactive
+    }
+    else
+    {
+        Debug.LogError("ThumbsUpIconPrefab not assigned.");
+    }
+
+    if (photonView != null)
+    {
+        Debug.Log("PhotonView found on this GameObject!");
+    }
+    else
+    {
+        Debug.LogError("PhotonView is missing on this GameObject!");
+    }
+}
 
     void LateUpdate()
     {
@@ -70,15 +111,43 @@ public class PlayerInteractionManager : MonoBehaviourPun
     {
         Debug.Log($"Interaction button clicked for player: {photonView.Owner.NickName}");
 
-        // Call RPC to show thumbs-up icon on all clients and reward coins to the clicked player
-        if (PhotonNetwork.IsConnected)
+        // Store the PhotonView of the clicked player
+        targetPhotonView = photonView;
+
+        // Activate confirmation UI for the clicking player
+        if (thumbsUpUI != null)
         {
-            photonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
-            photonView.RPC("RewardCoins", RpcTarget.AllBuffered, photonView.Owner.NickName, 10);
+            thumbsUpUI.SetActive(true);
+        }
+    }
+
+    private void OnNoThumbsUpButtonClicked()
+    {
+        Debug.Log("Thumbs-up interaction canceled.");
+        if (thumbsUpUI != null)
+        {
+            thumbsUpUI.SetActive(false); // Hide the confirmation UI
+        }
+    }
+
+    private void OnThumbsUpYesButtonClicked()
+    {
+        Debug.Log("Thumbs-up interaction confirmed.");
+
+        if (thumbsUpUI != null)
+        {
+            thumbsUpUI.SetActive(false); // Hide the confirmation UI
+        }
+
+        // Call RPC to show thumbs-up icon and reward coins
+        if (targetPhotonView != null && PhotonNetwork.IsConnected)
+        {
+            targetPhotonView.RPC("ShowThumbsUpIcon", RpcTarget.All);
+            targetPhotonView.RPC("RewardCoins", RpcTarget.AllBuffered, photonView.Owner.NickName, 10);
         }
         else
         {
-            Debug.LogError("Not connected to Photon.");
+            Debug.LogError("Target PhotonView is null or not connected to Photon.");
         }
     }
 
