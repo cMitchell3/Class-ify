@@ -20,6 +20,8 @@ public class BuyItemLogic : MonoBehaviour
     public Button optionOne;
     public Button optionTwo;
     public Button optionThree;
+    public Button optionFour;
+    public Button optionFive;
 
     private string inventoryContent = "";
 
@@ -47,6 +49,12 @@ public class BuyItemLogic : MonoBehaviour
             }
             if (inventoryContents[i].Equals("3")) {
                 IncreaseButtonOpacity(optionThree.GetComponentInChildren<TextMeshProUGUI>());
+            }
+            if (inventoryContents[i].Equals("4")) {
+                IncreaseButtonOpacity(optionFour.GetComponentInChildren<TextMeshProUGUI>());
+            }
+            if (inventoryContents[i].Equals("5")) {
+                IncreaseButtonOpacity(optionFive.GetComponentInChildren<TextMeshProUGUI>());
             }
         }
         
@@ -87,6 +95,14 @@ public class BuyItemLogic : MonoBehaviour
 
             if (button.GetInstanceID() == optionThree.GetInstanceID()) {
                 inventoryContent += "3";
+            }
+
+            if (button.GetInstanceID() == optionFour.GetInstanceID()) {
+                inventoryContent += "4";
+            }
+
+            if (button.GetInstanceID() == optionFive.GetInstanceID()) {
+                inventoryContent += "5";
             }
 
         }
