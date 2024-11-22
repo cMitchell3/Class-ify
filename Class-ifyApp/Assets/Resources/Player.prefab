@@ -442,8 +442,6 @@ Transform:
   - {fileID: 5479957411545851346}
   - {fileID: 3211931693916569527}
   - {fileID: 1146709212439000775}
-  - {fileID: 2503021226307900746}
-  - {fileID: 4343181925275984146}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &6379872432193420369
@@ -728,51 +726,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   interactionButtonPrefab: {fileID: 4901614141991782749, guid: b119e9a2f2e4e8a4d9ad536fbebc4783, type: 3}
   thumbsUpIconPrefab: {fileID: 4016571156223011415, guid: 758b100fea8d14c448199fa210807d16, type: 3}
-  screenOffset: {x: 0, y: 2, z: 0}
---- !u!1 &9202949301744861306
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 4343181925275984146}
-  - component: {fileID: 2577946315558588107}
-  m_Layer: 0
-  m_Name: ThumbsUpLogic
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &4343181925275984146
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9202949301744861306}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1794340319430463702}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2577946315558588107
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9202949301744861306}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb143a38f43994b4e95f14b925b51fff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  interactionButtonPrefab: {fileID: 0}
-  thumbsUpIconPrefab: {fileID: 0}
   screenOffset: {x: 0, y: 2, z: 0}
