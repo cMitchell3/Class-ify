@@ -221,7 +221,7 @@ public class FirestoreManager : MonoBehaviour
         });
     }
 
-    private async Task<int> GetUserCurrency(string email)
+    public async Task<int> GetUserCurrency(string email)
     {
         int coins = 0;
         DocumentReference docRef = db.Collection("user").Document(email);

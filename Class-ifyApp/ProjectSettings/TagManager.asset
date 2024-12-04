@@ -9,6 +9,7 @@ TagManager:
   - VoiceManager
   - Wall
   - CosmeticLogic
+  - CurrencyTextDisplay
   layers:
   - Default
   - TransparentFX

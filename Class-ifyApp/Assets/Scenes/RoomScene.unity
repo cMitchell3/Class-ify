@@ -6214,8 +6214,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 120741559}
   m_HandleRect: {fileID: 120741558}
   m_Direction: 2
-  m_Value: 0
-  m_Size: 0.9970711
+  m_Value: 0.99999994
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -7099,6 +7099,7 @@ MonoBehaviour:
   importButton: {fileID: 1958785731}
   errorMessage: {fileID: 1435178139}
   roomCodeDisplay: {fileID: 1058122100}
+  currencyDisplayController: {fileID: 1213157597}
 --- !u!1 &364384197
 GameObject:
   m_ObjectHideFlags: 0
@@ -10187,7 +10188,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -199.99994, y: -364.19153}
+  m_AnchoredPosition: {x: -199.99994, y: -0.0000076293945}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!114 &788426513
@@ -13506,7 +13507,7 @@ GameObject:
   - component: {fileID: 1213157597}
   m_Layer: 5
   m_Name: CurrencyText
-  m_TagString: Untagged
+  m_TagString: CurrencyTextDisplay
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

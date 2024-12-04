@@ -11,6 +11,7 @@ public class ImportFile : MonoBehaviour
     public Button importButton;
     public TextMeshProUGUI errorMessage;
     public TextMeshProUGUI roomCodeDisplay;
+    public CurrencyDisplayController currencyDisplayController;
     private string userEmail;
     private static int importCoins = 10;
     private Color errorRed;
@@ -47,7 +48,8 @@ public class ImportFile : MonoBehaviour
                 errorMessage.color = Color.white;
                 errorMessage.text = "Uploading...";
                 await FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
-                FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
+                // FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
+                currencyDisplayController.AddNumber(importCoins);
                 errorMessage.color = errorRed;
                 errorMessage.text = "";
             }

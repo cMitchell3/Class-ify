@@ -13,16 +13,19 @@ public class CurrencyDisplayController : MonoBehaviour
     private int currencyAmount = 0;
 
     // Firebase variables
-    private FirebaseFirestore db;
-    private FirebaseAuth auth;
-    private FirebaseUser user;
+    // private FirebaseFirestore db;
+    private string userEmail;
 
-    private void Start()
+    private async void Start()
     {
         // Initialize Firebase
-        db = FirebaseFirestore.DefaultInstance;
-        auth = FirebaseAuth.DefaultInstance;
-        user = auth.CurrentUser;
+        // db = FirebaseFirestore.DefaultInstance;
+        if (FirestoreManager.Instance == null || FirestoreManager.Instance.db == null)
+        {
+            Debug.LogError("Firestore or FirestoreManager instance is not initialized.");
+        }
+
+        userEmail = FirebaseAuthManager.Instance.GetUserEmail();
 
         // Check if TextMeshPro component is assigned
         if (tmpText == null)
@@ -31,33 +34,34 @@ public class CurrencyDisplayController : MonoBehaviour
         }
 
         // Load currency amount from Firestore and display it
-        LoadCurrencyFromDatabase();
+        // LoadCurrencyFromDatabase();
+        currencyAmount = await FirestoreManager.Instance.GetUserCurrency(userEmail);
     }
 
     // Load currency amount from Firestore
-    private async void LoadCurrencyFromDatabase()
-    {
-        if (user == null)
-        {
-            Debug.LogWarning("No authenticated user found.");
-            return;
-        }
+    // private async void LoadCurrencyFromDatabase()
+    // {
+    //     if (userEmail == null)
+    //     {
+    //         Debug.LogWarning("No authenticated user found.");
+    //         return;
+    //     }
 
-        DocumentReference docRef = db.Collection("user").Document(user.Email);
-        DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
+    //     DocumentReference docRef = db.Collection("user").Document(userEmail);
+    //     DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
-        if (snapshot.Exists && snapshot.ContainsField("coins"))
-        {
-            // Retrieve and update currency amount
-            currencyAmount = snapshot.GetValue<int>("coins");
-            UpdateText();
-            Debug.Log($"Currency loaded: {currencyAmount} coins");
-        }
-        else
-        {
-            Debug.LogWarning("No coins field found for user.");
-        }
-    }
+    //     if (snapshot.Exists && snapshot.ContainsField("coins"))
+    //     {
+    //         // Retrieve and update currency amount
+    //         currencyAmount = snapshot.GetValue<int>("coins");
+    //         UpdateText();
+    //         Debug.Log($"Currency loaded: {currencyAmount} coins");
+    //     }
+    //     else
+    //     {
+    //         Debug.LogWarning("No coins field found for user.");
+    //     }
+    // }
 
     // Add/Subtract a certain amount to currency
     public void AddNumber(int amount)
@@ -66,7 +70,8 @@ public class CurrencyDisplayController : MonoBehaviour
         UpdateText();
 
         // Optionally, update Firestore with the new currency amount if needed
-        UpdateCurrencyInDatabase();
+        FirestoreManager.Instance.UpdateUserCurrency(userEmail, currencyAmount);
+        // UpdateCurrencyInDatabase();
     }
 
     // Update the currency UI number
@@ -76,23 +81,23 @@ public class CurrencyDisplayController : MonoBehaviour
     }
 
     // Update currency amount in Firestore
-    public async void UpdateCurrencyInDatabase()
-    {
-        if (user == null)
-        {
-            Debug.LogWarning("No authenticated user found.");
-            return;
-        }
+    // public async void UpdateCurrencyInDatabase()
+    // {
+    //     if (user == null)
+    //     {
+    //         Debug.LogWarning("No authenticated user found.");
+    //         return;
+    //     }
 
-        DocumentReference docRef = db.Collection("user").Document(user.Email);
-        Dictionary<string, object> updates = new Dictionary<string, object>
-        {
-            { "coins", currencyAmount }
-        };
+    //     DocumentReference docRef = db.Collection("user").Document(userEmail);
+    //     Dictionary<string, object> updates = new Dictionary<string, object>
+    //     {
+    //         { "coins", currencyAmount }
+    //     };
 
-        await docRef.UpdateAsync(updates);
-        Debug.Log($"Currency updated in Firestore: {currencyAmount} coins");
-    }
+    //     await docRef.UpdateAsync(updates);
+    //     Debug.Log($"Currency updated in Firestore: {currencyAmount} coins");
+    // }
 
     public int getCurrencyAmount() {
         return currencyAmount;

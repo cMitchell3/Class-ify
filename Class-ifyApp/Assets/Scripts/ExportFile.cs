@@ -9,6 +9,16 @@ using System.IO;
 public class ExportFile : MonoBehaviour
 {
     private static int exportCoins = 20;
+    public static CurrencyDisplayController currencyDisplayController;
+
+    void Start()
+    {
+        currencyDisplayController = GameObject.FindGameObjectWithTag("CurrencyTextDisplay").GetComponent<CurrencyDisplayController>();
+        if (currencyDisplayController == null)
+        {
+            Debug.LogError("Currency display controller cannot be null");
+        }
+    }
 
     public static void SaveFile(string fileName, string extension, byte[] content, string uploadUser)
     {
@@ -22,7 +32,9 @@ public class ExportFile : MonoBehaviour
 
             if (!FirebaseAuthManager.Instance.GetUserEmail().Equals(uploadUser))
             {
-                FirestoreManager.Instance.UpdateUserCurrency(uploadUser, exportCoins);
+                // FirestoreManager.Instance.UpdateUserCurrency(uploadUser, exportCoins);
+                currencyDisplayController.AddNumber(exportCoins);
+
             }
         }
     }
