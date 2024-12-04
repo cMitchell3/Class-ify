@@ -65,13 +65,16 @@ public class CurrencyDisplayController : MonoBehaviour
     // }
 
     // Add/Subtract a certain amount to currency
-    public void AddNumber(int amount)
+    public void AddNumber(int amount, bool updateInDb)
     {
         currencyAmount += amount;
         UpdateText();
 
         // Optionally, update Firestore with the new currency amount if needed
-        FirestoreManager.Instance.UpdateUserCurrency(userEmail, amount);
+        if (updateInDb)
+        {
+            FirestoreManager.Instance.UpdateUserCurrency(userEmail, amount);
+        }
         // UpdateCurrencyInDatabase();
     }
 

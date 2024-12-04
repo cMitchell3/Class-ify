@@ -63,7 +63,7 @@ public class BuyItemLogic : MonoBehaviour
         int newCoinsTwo = coinsTwo - coinsOne;
 
         if ((coinsTwo - coinsOne) >= 0) {
-            currencyDisplay.AddNumber(-1 * coinsOne);
+            currencyDisplay.AddNumber(-1 * coinsOne, true);
 
             // Update textTwo with the new value
             textTwo.text = $"Coins: {newCoinsTwo}";

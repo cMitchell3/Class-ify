@@ -48,8 +48,8 @@ public class ImportFile : MonoBehaviour
                 errorMessage.color = Color.white;
                 errorMessage.text = "Uploading...";
                 await FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
-                // FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
-                currencyDisplayController.AddNumber(importCoins);
+                FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
+                currencyDisplayController.AddNumber(importCoins, false);
                 errorMessage.color = errorRed;
                 errorMessage.text = "";
             }

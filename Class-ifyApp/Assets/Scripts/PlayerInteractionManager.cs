@@ -163,7 +163,7 @@ public class PlayerInteractionManager : MonoBehaviourPun
 
             if (currencyController != null)
             {
-                currencyController.AddNumber(amount); // Add coins
+                currencyController.AddNumber(amount, true); // Add coins
                 Debug.Log($"Added {amount} coins to {photonView.Owner.NickName}");
             }
             else

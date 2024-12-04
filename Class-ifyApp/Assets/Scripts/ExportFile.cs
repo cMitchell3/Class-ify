@@ -11,9 +11,9 @@ public class ExportFile : MonoBehaviour
     private static int exportCoins = 20;
     public static CurrencyDisplayController currencyDisplayController;
 
-    void Start()
+    void Awake()
     {
-        currencyDisplayController = GameObject.FindGameObjectWithTag("CurrencyTextDisplay").GetComponent<CurrencyDisplayController>();
+        currencyDisplayController = FindObjectOfType<CurrencyDisplayController>();
         if (currencyDisplayController == null)
         {
             Debug.LogError("Currency display controller cannot be null");
@@ -23,6 +23,7 @@ public class ExportFile : MonoBehaviour
     public static void SaveFile(string fileName, string extension, byte[] content, string uploadUser)
     {
         Debug.Log("Opening save file dialog");
+        Debug.Log("Current coins: " + currencyDisplayController);
         string savePath = SaveFileDialog(fileName, extension);
 
         if (!savePath.Equals(""))
@@ -32,8 +33,8 @@ public class ExportFile : MonoBehaviour
 
             if (!FirebaseAuthManager.Instance.GetUserEmail().Equals(uploadUser))
             {
-                // FirestoreManager.Instance.UpdateUserCurrency(uploadUser, exportCoins);
-                currencyDisplayController.AddNumber(exportCoins);
+                FirestoreManager.Instance.UpdateUserCurrency(uploadUser, exportCoins);
+                currencyDisplayController.AddNumber(exportCoins, false);
 
             }
         }
