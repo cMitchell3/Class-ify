@@ -188,4 +188,13 @@ public class InventoryLogic : MonoBehaviour
 
         paintingBackground.color = Color.green;
     }
+
+    public void EquipNothingRoom()
+    {
+        cosmeticLogic.treeEquipped = false;
+        cosmeticLogic.paintingEquipped = false;
+
+        paintingBackground.color = Color.magenta;
+        treeBackground.color = Color.magenta;
+    }
 }

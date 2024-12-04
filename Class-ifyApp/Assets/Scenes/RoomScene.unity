@@ -16764,9 +16764,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 839416288}
         m_TargetAssemblyTypeName: InventoryLogic, Assembly-CSharp
-        m_MethodName: EquipNothing
+        m_MethodName: EquipNothingRoom
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
