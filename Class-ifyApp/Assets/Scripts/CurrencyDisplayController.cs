@@ -36,6 +36,7 @@ public class CurrencyDisplayController : MonoBehaviour
         // Load currency amount from Firestore and display it
         // LoadCurrencyFromDatabase();
         currencyAmount = await FirestoreManager.Instance.GetUserCurrency(userEmail);
+        UpdateText();
     }
 
     // Load currency amount from Firestore
@@ -70,7 +71,7 @@ public class CurrencyDisplayController : MonoBehaviour
         UpdateText();
 
         // Optionally, update Firestore with the new currency amount if needed
-        FirestoreManager.Instance.UpdateUserCurrency(userEmail, currencyAmount);
+        FirestoreManager.Instance.UpdateUserCurrency(userEmail, amount);
         // UpdateCurrencyInDatabase();
     }
 
