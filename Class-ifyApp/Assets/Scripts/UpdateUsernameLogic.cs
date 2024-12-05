@@ -55,7 +55,7 @@ public class UpdateUsernameLogic : MonoBehaviour
                     {
                         { "username", usernameInputField.text },
                     };
-        docRef.SetAsync(userUsername).ContinueWithOnMainThread(task => {
+        docRef.UpdateAsync(userUsername).ContinueWithOnMainThread(task => {
             Debug.Log("Username changed");
         });
         usernameConfirmationText.text = "Username updated successfully.";
