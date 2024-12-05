@@ -221,7 +221,41 @@ public class FirestoreManager : MonoBehaviour
         });
     }
 
-    private async Task<int> GetUserCurrency(string email)
+    public void ListenToUserCollection(string userEmail, Action<int> onCurrencyChanged)
+    {
+        Debug.Log("Listening for user collection file changes");
+        DocumentReference userRef = db.Collection("user").Document(userEmail);
+
+        userRef.Listen(snapshot =>
+        {
+            if (snapshot.Exists)
+            {
+                var userData = snapshot.ToDictionary();
+
+                if (userData.ContainsKey("coins"))
+                {
+                    if (userData["coins"] is long coinValue)
+                    {
+                        onCurrencyChanged?.Invoke((int)coinValue);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("The 'coins' field is not a valid number.");
+                    }
+                }
+                else
+                {
+                    Debug.LogWarning("No 'coins' field found in the user document.");
+                }
+            }
+            else
+            {
+                Debug.LogWarning("User document does not exist.");
+            }
+        });
+    }
+
+    public async Task<int> GetUserCurrency(string email)
     {
         int coins = 0;
         DocumentReference docRef = db.Collection("user").Document(email);
