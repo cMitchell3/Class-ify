@@ -14,6 +14,7 @@ public class ImportFile : MonoBehaviour
     private string userEmail;
     private static int importCoins = 10;
     private Color errorRed;
+    private CurrencyDisplayController currencyDisplayController;
 
     void Start()
     {
@@ -26,6 +27,8 @@ public class ImportFile : MonoBehaviour
         {
             importButton.onClick.AddListener(OnImportButtonClicked);
         }   
+
+        currencyDisplayController = FindObjectOfType<CurrencyDisplayController>();
 
         Color color;
         ColorUtility.TryParseHtmlString("#C70D0D", out color);
@@ -46,8 +49,11 @@ public class ImportFile : MonoBehaviour
             {
                 errorMessage.color = Color.white;
                 errorMessage.text = "Uploading...";
+
                 await FirestoreManager.Instance.UploadFileToFirestore(filePath, roomCode);
                 FirestoreManager.Instance.UpdateUserCurrency(userEmail, importCoins);
+                // currencyDisplayController.AddNumber(userEmail, importCoins);
+
                 errorMessage.color = errorRed;
                 errorMessage.text = "";
             }

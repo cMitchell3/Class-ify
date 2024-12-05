@@ -9,9 +9,11 @@ using System.IO;
 public class ExportFile : MonoBehaviour
 {
     private static int exportCoins = 20;
+    private static string userEmail = FirebaseAuthManager.Instance.GetUserEmail();
 
     public static void SaveFile(string fileName, string extension, byte[] content, string uploadUser)
     {
+        CurrencyDisplayController currencyDisplayController = FindObjectOfType<CurrencyDisplayController>();
         Debug.Log("Opening save file dialog");
         string savePath = SaveFileDialog(fileName, extension);
 
@@ -23,6 +25,7 @@ public class ExportFile : MonoBehaviour
             if (!FirebaseAuthManager.Instance.GetUserEmail().Equals(uploadUser))
             {
                 FirestoreManager.Instance.UpdateUserCurrency(uploadUser, exportCoins);
+                // currencyDisplayController.AddNumber(uploadUser, exportCoins);
             }
         }
     }
