@@ -9,11 +9,13 @@ public class FileCabinetLogic : MonoBehaviour
     public GameObject fileCabinetObject;
     public GameObject playerController;
     public TextMeshProUGUI errorMessage;
+    public GameObject chatBox;
 
     public void ActivateFileCabinet()
     {
         fileCabinetObject.SetActive(!fileCabinetObject.activeSelf);
         EnablePlayerMovement(false);
+        chatBox.SetActive(false);
     }
 
     public void Back()
@@ -22,6 +24,7 @@ public class FileCabinetLogic : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
         EnablePlayerMovement(true);
         errorMessage.text = "";
+        chatBox.SetActive(true);
     }
 
     private void EnablePlayerMovement(bool isEnabled)

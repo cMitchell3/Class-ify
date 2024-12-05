@@ -600,7 +600,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 1}
   m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: -199.99994, y: -138.28508}
+  m_AnchoredPosition: {x: -199.99994, y: -18.037846}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
 --- !u!222 &105235135
@@ -8626,6 +8626,7 @@ MonoBehaviour:
   whiteboardObject: {fileID: 504925054}
   lockButton: {fileID: 1152159998}
   gameNetworkManager: {fileID: 4111932193739848107}
+  chatBox: {fileID: 741884482}
 --- !u!4 &464780196
 Transform:
   m_ObjectHideFlags: 0
@@ -9654,6 +9655,7 @@ MonoBehaviour:
   fileCabinetObject: {fileID: 352600250}
   playerController: {fileID: 7955323815544713653, guid: eb1c2a5f41cfaf440817f2812a0eeb0e, type: 3}
   errorMessage: {fileID: 1435178139}
+  chatBox: {fileID: 741884482}
 --- !u!4 &571355025
 Transform:
   m_ObjectHideFlags: 0
@@ -9992,7 +9994,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 1950457362}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.9921748
+  m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -12263,6 +12265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pauseMenu: {fileID: 675151862}
+  chatBox: {fileID: 741884482}
 --- !u!4 &888528425
 Transform:
   m_ObjectHideFlags: 0

@@ -11,6 +11,7 @@ public class WhiteboardLogic : MonoBehaviour
     public GameObject whiteboardObject;
     public Button lockButton;
     public GameNetworkManager gameNetworkManager;
+    public GameObject chatBox;
 
     private async void Start()
     {
@@ -32,6 +33,7 @@ public class WhiteboardLogic : MonoBehaviour
     {
         whiteboardObject.SetActive(!whiteboardObject.activeSelf);
         EnablePlayerMovement(false);
+        chatBox.SetActive(false);
     }
 
     public void Back()
@@ -39,6 +41,7 @@ public class WhiteboardLogic : MonoBehaviour
         whiteboardObject.SetActive(false);
         EventSystem.current.SetSelectedGameObject(null);
         EnablePlayerMovement(true);
+        chatBox.SetActive(true);
     }
 
     private void EnablePlayerMovement(bool isEnabled)
